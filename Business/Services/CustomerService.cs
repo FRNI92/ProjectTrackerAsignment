@@ -52,18 +52,16 @@ public class CustomerService : BaseService<CustomerEntity>, ICustomerService
         return CustomerFactory.ToDto(updatedCustomer);
     }
 
-    public async Task DeleteCustomerAsync(CustomerDto customerDto)
+    public async Task<bool> DeleteCustomerAsync(CustomerDto customerDto)
     {
-        Console.WriteLine("Deleting customer");
-
-    
-        var customer = await _customerRepository.GetAsync(x => x.Id == customerDto.Id);//hämtar entitet med det idt
+        var customer = await _customerRepository.GetAsync(x => x.Id == customerDto.Id);
         if (customer == null)
         {
-            throw new KeyNotFoundException("Customer not found");
+            return false; // Returnera false om kunden inte hittades
         }
 
-        await _customerRepository.DeleteAsync(x => x.Id == customer.Id);//anropar repository
+        await _customerRepository.DeleteAsync(x => x.Id == customer.Id);
+        return true; // Returnera true om raderingen lyckades
     }
 }
 

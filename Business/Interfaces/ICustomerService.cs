@@ -17,6 +17,6 @@ namespace Business.Interfaces
 
         Task<CustomerDto> UpdateCustomerAsync(CustomerDto customerDto);
 
-        Task DeleteCustomerAsync(CustomerDto customerDto);
+        Task<bool> DeleteCustomerAsync(CustomerDto customerDto);
     }
 }

@@ -10,74 +10,113 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     private readonly DataContext _context = context;
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
 
-
-
-    public async Task<TEntity> CreateAsync(TEntity entity)
+    public virtual async Task<TEntity> CreateAsync(TEntity entity)
     {
-        Console.WriteLine("Creating Something");
-        if (entity == null)
+        try
         {
-            throw new ArgumentNullException(nameof(entity));
+            Console.WriteLine("Creating Something");
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity), $"{typeof(TEntity).Name} cannot be null.");
+            }
+            else
+            {
+                await _dbSet.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return entity;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            //await _dbSet.AddAsync(entity);
-            await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
-            return entity;
+            Console.WriteLine($"Error In CreateAsync:{ex.Message}");
+            throw;
         }
     }
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
-        Console.WriteLine("BaseRepository: Fetching all entities In...");
-        return await _dbSet.ToListAsync();
-    }
-
-
-    // x => x.Id == Id , x => x.Email == Email
-    public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression)
-    {
-        Console.WriteLine("BaseRepository: Fetching single entity...");
-        var entity = await _dbSet.FirstOrDefaultAsync(expression);
-
-        if (entity == null)
-            throw new KeyNotFoundException("Entity not found");
-
-        return entity;
-    }
-
-    public async Task<TEntity> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
-    {
-
-        var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
-        if (existingEntity != null && updatedEntity != null)
+        try
         {
-            _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
-            await _context.SaveChangesAsync();
-            return existingEntity;
+            Console.WriteLine("BaseRepository: Fetching all entities In...");
+            return await _dbSet.ToListAsync();
         }
-        return null!;
-       
-     
-
-        //_dbSet.Entry(entity).State = EntityState.Modified;//ändrade till detta från update så att det inte skapas en ny entitet
-       // await _context.SaveChangesAsync();
-        //return entity;
-    }
-    public async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> expression)
-    {
-        var entity = _dbSet.FirstOrDefault(expression);
-        if (entity != null)
+        catch (Exception ex)
         {
-            _context.Remove(entity);
-            await _context.SaveChangesAsync();
-            return true;
+            Console.WriteLine($"Error In GetAllAsync:{ex.Message}");
+            throw;
         }
-        return false;
+    }
 
-       // Console.WriteLine("Deleting Customer");
-        //_dbSet.Remove(entity);//tar bort entiteten
-        //await _context.SaveChangesAsync();//sparar databasen
+    public virtual async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression)
+    {
+        try
+        {
+            Console.WriteLine("BaseRepository: Fetching single entity...");
+            var entity = await _dbSet.FirstOrDefaultAsync(expression);
+
+            if (entity == null)
+                throw new KeyNotFoundException("Entity not found");
+
+            return entity;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error In GetAsync:{ex.Message}");
+            throw;
+        }
+    }
+
+    public virtual async Task<TEntity> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
+    {
+
+        try
+        {
+            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
+            if (existingEntity != null && updatedEntity != null)
+            {
+                _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
+                await _context.SaveChangesAsync();
+                return existingEntity;
+            }
+            return null!;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in UpdateAsync:{ex.Message}");
+            throw;
+        }
+
+    }
+    public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> expression)
+    {
+        try
+        {
+            var entity = await _dbSet.FirstOrDefaultAsync(expression);
+            if (entity != null)
+            {
+                _context.Remove(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error With DeleteAsync{ex.Message}");
+            throw;
+        }
+    }
+
+    public virtual async Task<bool> DoesEntityExistAsync(Expression<Func<TEntity, bool>> expression)
+    {
+        try
+        {
+            return await _dbSet.AnyAsync(expression);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error with DoesEntityExistAsync{ex.Message}");
+            throw;
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace Data.Interfaces
         Task<TEntity> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity);
         //task:gör detta. <TEntity>: få tillbaka den här typen. MetodNamn. "tål" bara en enda object av typen TEntity
         Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> expression);
-        //task: gör detta. Metodnamn. Tål bara en av typen TEntity
+        //task: gör detta. Metodnamn. Tål bara en av typen
+        Task<bool> DoesEntityExistAsync(Expression<Func<TEntity, bool>> expression);
     }
 }

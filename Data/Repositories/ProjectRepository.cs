@@ -21,10 +21,5 @@ public class ProjectRepository : BaseRepository<ProjectEntity>, IProjectReposito
  
     }
 
-    //public async Task<IEnumerable<ProjectEntity>> GetAllWithStatusAsync()//.ThenInclude(emp => emp.FirstName)
-    //    {
-
-    //}
-
 }
 
