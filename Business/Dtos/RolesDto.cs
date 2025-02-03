@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-namespace Data.Entities;
+﻿using Data.Entities;
+using System.ComponentModel.DataAnnotations;
 
-public class RolesEntity
+namespace Business.Dtos;
+
+public class RolesDto
 {
     [Key]
     public int Id { get; set; } // Primärnyckel
@@ -11,6 +13,4 @@ public class RolesEntity
 
     public string? Description { get; set; } // Beskrivning av rollen (valfritt)
 
-
-    public ICollection<EmployeesEntity> Employees { get; set; } = new List<EmployeesEntity>();
 }
