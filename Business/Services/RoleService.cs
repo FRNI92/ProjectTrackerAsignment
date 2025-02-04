@@ -16,7 +16,7 @@ public class RoleService(IRolesRepository rolesRepository)
             var exists = await _rolesRepository.DoesEntityExistAsync(r => r.Name == RolesDto.Name);
             if (exists)
             {
-                throw new InvalidOperationException("A role with this name already exists.");
+                throw new ArgumentException("A role with this name already exists.");
             }
             var newEntity = RoleFactory.ToEntity(RolesDto);
             var createdEntity = await _rolesRepository.CreateAsync(newEntity);
@@ -26,6 +26,7 @@ public class RoleService(IRolesRepository rolesRepository)
         catch (Exception ex)
         {
             Console.WriteLine($"An error occured when creating role:{ex.Message}");
+            Console.WriteLine(ex.StackTrace);
             throw;
         }
     }
@@ -44,6 +45,7 @@ public class RoleService(IRolesRepository rolesRepository)
         catch (Exception ex)
         {
             Console.WriteLine($"Error when Getting Roles:{ex.Message}");
+            Console.WriteLine(ex.StackTrace);
             throw;
         }
     }
@@ -61,6 +63,7 @@ public class RoleService(IRolesRepository rolesRepository)
         catch (Exception ex)
         {
             Console.WriteLine($"Error occured when getting roles by Id{ex.Message}");
+            Console.WriteLine(ex.StackTrace);
             throw;
         }
     }
@@ -77,13 +80,15 @@ public class RoleService(IRolesRepository rolesRepository)
             if (existingRole == null)
                 throw new KeyNotFoundException($"No role found with ID {id}.");
 
-            var updatedEntity = RoleFactory.ToEntity(updatedRolesDto);
-            var updatedRole = await _rolesRepository.UpdateAsync(r => r.Id == id, updatedEntity);
-            return RoleFactory.ToDto(updatedRole);
+            RoleFactory.UpdateEntity(existingRole, updatedRolesDto);
+
+            await _rolesRepository.UpdateAsync(r => r.Id == id, existingRole);
+            return RoleFactory.ToDto(existingRole);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"An error occured when updating Roles{ex.Message}");
+            Console.WriteLine(ex.StackTrace);
             throw;
         }
     }
@@ -104,6 +109,7 @@ public class RoleService(IRolesRepository rolesRepository)
         catch (Exception ex)
         {
             Console.WriteLine($"An error occured when deleting role: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
             throw;
         }
     }
