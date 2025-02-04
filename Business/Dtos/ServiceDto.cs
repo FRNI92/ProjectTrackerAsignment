@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-namespace Data.Entities;
+namespace Business.Dtos;
 
-public class ServiceEntity
+public class ServiceDto
 {
     [Key]
     public int Id { get; set; } // Primärnyckel

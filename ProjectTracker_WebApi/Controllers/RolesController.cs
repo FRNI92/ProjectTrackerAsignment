@@ -7,17 +7,11 @@ namespace ProjectTracker_WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class RolesController : ControllerBase
+public class RolesController(RoleService rolesService) : ControllerBase
 {
 
-    private readonly RoleService _rolesService;
+    private readonly RoleService _rolesService = rolesService;
 
-    public RolesController(RoleService rolesService)
-    {
-        _rolesService = rolesService;
-    }
-
-    //  GET: Hämta alla roller
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RolesDto>>> GetAllRoles()
     {
@@ -25,7 +19,6 @@ public class RolesController : ControllerBase
         return Ok(roles);
     }
 
-    //  GET: Hämta en specifik roll med ID
     [HttpGet("{id}")]
     public async Task<ActionResult<RolesDto>> GetRoleById(int id)
     {
@@ -36,7 +29,6 @@ public class RolesController : ControllerBase
         return Ok(role);
     }
 
-    //  POST: Skapa en ny roll
     [HttpPost]
     public async Task<ActionResult<RolesDto>> CreateRole([FromBody] RolesDto newRole)
     {
@@ -58,7 +50,6 @@ public class RolesController : ControllerBase
         }
     }
 
-    //  PUT: Uppdatera en roll
     [HttpPut("{id}")]
     public async Task<ActionResult<RolesDto>> UpdateRole(int id, [FromBody] RolesDto updatedRole)
     {
@@ -82,7 +73,6 @@ public class RolesController : ControllerBase
         }
     }
 
-    //  DELETE: Radera en roll
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteRole(int id)
     {

@@ -1,5 +1,4 @@
-﻿
-namespace Data.Entities;
+﻿namespace Data.Entities;
 
 public class StatusEntity
 {
