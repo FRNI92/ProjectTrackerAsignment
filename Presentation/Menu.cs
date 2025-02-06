@@ -43,7 +43,7 @@ public class Menu
                     await DeleteProjectAsync();
                     break;
                 case "0":
-                    return; // Exit program
+                    return;
                 default:
                     Console.WriteLine("Invalid option. Try again.");
                     break;
@@ -66,9 +66,8 @@ public class Menu
             Console.WriteLine($"Project Number:{project.ProjectNumber}");
             Console.WriteLine($"Name: {project.Name}");
             Console.WriteLine($"Time Period: {project.StartDate} - {project.EndDate}");
-            //Console.WriteLine($"Status ID: {project.StatusId}"); behövs inte
             Console.WriteLine($"Current Status: {project.StatusName}");
-            Console.WriteLine(); // För att ge lite mellanrum mellan projekten
+            Console.WriteLine();
         }
         Console.WriteLine("\nPress any key to return to the menu...");
         Console.ReadKey();
@@ -108,21 +107,26 @@ public class Menu
         Console.Write("Enter Status ID (1 = Not started, 2 = In Progress, 3 = Completed): ");
         newProject.StatusId = int.Parse(Console.ReadLine()!);
 
-        Console.Write("Enter Customer ID:  (1 = Company A:, 2 = Companny B): ");
+        Console.WriteLine("Select Project Manager:");
+        Console.WriteLine("1 = Anna Andersson, 2 = Johan Johansson, 3 = Maria Karlsson");
+        Console.Write("Enter Employee ID: ");
+        newProject.EmployeeId = int.Parse(Console.ReadLine()!);
+
+        Console.WriteLine("Select Customer (Company who ordered the project):");
+        Console.WriteLine("1 = Company A, 2 = Company B, 3 = Company C");
+        Console.Write("Enter Customer ID: ");
         newProject.CustomerId = int.Parse(Console.ReadLine()!);
 
         Console.Write("Enter Service ID: (1 = IT-Support:, 2 = Consulting):");
         newProject.ServiceId = int.Parse(Console.ReadLine()!);
 
         Console.Write("Enter Duration (in hours): ");
-        newProject.ServiceDuration = decimal.Parse(Console.ReadLine()!);
+        newProject.Duration = decimal.Parse(Console.ReadLine()!);
 
-        Console.Write("Enter Project Manager (Employee ID): (1 = Anna : 2 = Johan)");
-        newProject.EmployeeId = int.Parse(Console.ReadLine()!);
 
 
         var createdProject = await _projectService.CreateProjectAsync(newProject);
-        Console.WriteLine($"Project created: {createdProject.Name} Total Price: {createdProject.TotalPrice} SEK\"");
+        Console.WriteLine($"Project created: {createdProject.Name} Total Price: {createdProject.TotalPrice} SEK");
         Console.ReadKey();
     }
 
@@ -151,7 +155,9 @@ public class Menu
             Console.WriteLine($"Customer Name: {project.CustomerName}");
             Console.WriteLine($"Employee Name: {project.EmployeeName}");
             Console.WriteLine($"The Service Purchased: {project.ServiceName}");
-         
+            Console.WriteLine($"The Service Duration is set to: {project.Duration} Hours");
+            Console.WriteLine($"The Service Total Price Is: {project.TotalPrice} SEK");
+
             Console.WriteLine("------------------------------------");
             index++;
         }
@@ -184,6 +190,9 @@ public class Menu
             Console.Write($"Enter new Service ID: (1 = IT-Support:, 2 = Consulting): (leave blank to keep current:({selectedProject.ServiceId}): ");
             var newServiceId = Console.ReadLine();
 
+            Console.Write($"Enter new Service-Duration:(leave blank to keep current:({selectedProject.Duration}): ");
+            var newServiceDuration = Console.ReadLine();
+
             Console.Write($"Enter New Project Manager (Employee ID): (1 = Anna : 2 = Johan)(leave blank to keep current:({selectedProject.EmployeeId}): ");
             var newEmployeeId = Console.ReadLine();
 
@@ -199,6 +208,7 @@ public class Menu
                 StatusId = string.IsNullOrWhiteSpace(newStatusId) ? selectedProject.StatusId : int.Parse(newStatusId),
                 CustomerId = string.IsNullOrWhiteSpace(newCustomerId) ? selectedProject.CustomerId : int.Parse(newCustomerId),
                 ServiceId = string.IsNullOrWhiteSpace(newServiceId) ? selectedProject.ServiceId : int.Parse(newServiceId),
+                Duration = string.IsNullOrWhiteSpace(newServiceDuration) ? selectedProject.Duration : int.Parse(newServiceDuration),
                 EmployeeId = string.IsNullOrWhiteSpace(newEmployeeId) ? selectedProject.EmployeeId : int.Parse(newEmployeeId),
             };
 

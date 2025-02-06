@@ -29,20 +29,23 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         );
 
     modelBuilder.Entity<CustomerEntity>().HasData(
-            new CustomerEntity { Id = 1, Name = "Company A", Email = "contact@companya.com", PhoneNumber = "123456789" },
-            new CustomerEntity { Id = 2, Name = "Company B", Email = "contact@companyb.com", PhoneNumber = "987654321" }
+            new CustomerEntity { Id = 1, Name = "Company A", Email = "contact@companyA.com", PhoneNumber = "123456789" },
+            new CustomerEntity { Id = 2, Name = "Company B", Email = "contact@companyB.com", PhoneNumber = "987654321" },
+            new CustomerEntity { Id = 3, Name = "Company c", Email = "contact@companyC.com", PhoneNumber = "987988976" }
         );
     modelBuilder.Entity<ServiceEntity>().HasData(
             new ServiceEntity { Id = 1, Name = "IT Support", Description = "Technical support", Duration = 2, Price = 500 },
             new ServiceEntity { Id = 2, Name = "Consulting", Description = "Business consulting", Duration = 5, Price = 1500 }
         );
     modelBuilder.Entity<EmployeesEntity>().HasData(
-            new EmployeesEntity { Id = 1, FirstName = "Anna", LastName = "Svensson", Email = "anna@company.com", RoleId = 1 },
-            new EmployeesEntity { Id = 2, FirstName = "Johan", LastName = "Andersson", Email = "johan@company.com", RoleId = 2 }
+            new EmployeesEntity { Id = 1, FirstName = "Anna", LastName = "Andersson", Email = "anna@company.com", RoleId = 1 },
+            new EmployeesEntity { Id = 2, FirstName = "Johan", LastName = "Johansson", Email = "johan@company.com", RoleId = 2 },
+            new EmployeesEntity { Id = 3, FirstName = "Maria", LastName = "Karlsson", Email = "Maria@company.com", RoleId = 1 }
         );
     modelBuilder.Entity<ProjectEntity>().HasData(
             new ProjectEntity { Id = 1,ProjectNumber = "P-101", Name = "Projekt A", Description = "Första projektet", StartDate = new DateTime(2024, 1, 1), StatusId = 1, CustomerId = 1, ServiceId = 1, EmployeeId = 1, },
             new ProjectEntity { Id = 2,ProjectNumber = "P-102", Name = "Projekt B", Description = "Andra projektet", StartDate = new DateTime(2024, 1, 1), StatusId = 2, CustomerId = 2, ServiceId = 2, EmployeeId = 2, }
         );
-    }
+    }//"1 = Anna Andersson, 2 = Johan Johansson, 3 = Maria Karlsson"
+    //"1 = Company A, 2 = Company B, 3 = Company C"
 }

@@ -27,8 +27,10 @@ public static class ProjectFactory
             EmployeeId = projectDto.EmployeeId,
             CustomerId = projectDto.CustomerId,
             ServiceId = projectDto.ServiceId,
-            
-            
+
+            Duration = projectDto.Duration, // 🔹 Spara durationen
+            TotalPrice = projectDto.TotalPrice
+
         };
     }
 
@@ -48,6 +50,10 @@ public static class ProjectFactory
             Description = projectEntity.Description,
             StartDate = projectEntity.StartDate,
             EndDate = projectEntity.EndDate,
+
+            Duration = projectEntity.Duration, // Projektets specifika duration
+            TotalPrice = projectEntity.TotalPrice,
+
             StatusId = projectEntity.StatusId,
             StatusName = projectEntity.Status?.Name ?? "No status assigned",// hantera null under utveckling
             
@@ -59,8 +65,7 @@ public static class ProjectFactory
             
             ServiceId = projectEntity.ServiceId,
             ServiceName = projectEntity.Service?.Name ?? "No service",
-            ServicePrice = projectEntity.Service?.Price ?? 0, // Hämtar pris från ServiceEntity
-            ServiceDuration = projectEntity.Service?.Duration ?? 0, // Hämtar duration från ServiceEntity
+           
         };
     }
 }

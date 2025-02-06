@@ -21,6 +21,7 @@ public class ProjectDto
     public DateTime? EndDate { get; set; } // Slutdatum
 
     public decimal TotalPrice { get; set; }
+    public decimal Duration { get; set; }
 
     [Required]
     public int StatusId { get; set; } // Foreign Key till StatusEntity
@@ -33,8 +34,6 @@ public class ProjectDto
     
     public int ServiceId { get; set; } // Foreign Key till ServiceEntity
     public string ServiceName { get; set; }
-    public decimal ServicePrice { get; set; } // Nytt fält
-    public decimal ServiceDuration { get; set; } // Nytt fält
     
     [Required]
     public int EmployeeId { get; set; } // Foreign Key till EmployeeEntity
