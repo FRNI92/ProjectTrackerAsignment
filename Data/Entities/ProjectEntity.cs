@@ -21,6 +21,9 @@ public class ProjectEntity
 
     public DateTime? EndDate { get; set; } 
 
+    public decimal TotalPrice { get; set; }
+    public decimal Duration { get; set; }
+
 
     [Required]
     public int StatusId { get; set; } // Foreign Key till StatusEntity

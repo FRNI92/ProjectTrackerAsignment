@@ -16,9 +16,19 @@ public class ProjectRepository : BaseRepository<ProjectEntity>, IProjectReposito
 
     public async override Task<IEnumerable<ProjectEntity>> GetAllAsync()
     {
-        var entities = await _context.Projects.Include(s => s.Status).Include(p => p.Employee).Include(p => p.Customer).Include(p => p.Service).ToListAsync();
+        var entities = await _context.Projects
+            .Include(s => s.Status)
+            .Include(p => p.Employee)
+            .Include(p => p.Customer)
+            .Include(p => p.Service)
+            .ToListAsync();
         return entities;
  
+    }
+
+    public async Task<ServiceEntity?> GetServiceByIdAsync(int serviceId)
+    {
+        return await _context.Services.FirstOrDefaultAsync(s => s.Id == serviceId);
     }
 
 }

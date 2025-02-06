@@ -114,12 +114,15 @@ public class Menu
         Console.Write("Enter Service ID: (1 = IT-Support:, 2 = Consulting):");
         newProject.ServiceId = int.Parse(Console.ReadLine()!);
 
+        Console.Write("Enter Duration (in hours): ");
+        newProject.ServiceDuration = decimal.Parse(Console.ReadLine()!);
+
         Console.Write("Enter Project Manager (Employee ID): (1 = Anna : 2 = Johan)");
         newProject.EmployeeId = int.Parse(Console.ReadLine()!);
 
 
         var createdProject = await _projectService.CreateProjectAsync(newProject);
-        Console.WriteLine($"Project created: {createdProject.Name}");
+        Console.WriteLine($"Project created: {createdProject.Name} Total Price: {createdProject.TotalPrice} SEK\"");
         Console.ReadKey();
     }
 
@@ -160,28 +163,28 @@ public class Menu
         {
             var selectedProject = projects.ElementAt(choice - 1); //hämta vald kund
 
-            Console.Write("Enter new name (leave blank to keep current): ");
+            Console.Write($"Enter new name (leave blank to keep current:({selectedProject.Name}): ");
             var newName = Console.ReadLine();
 
-            Console.Write("Enter new Description (leave blank to keep current): ");
+            Console.Write($"Enter new Description (leave blank to keep current:({selectedProject.Description}): ");
             var newDescription = Console.ReadLine();
 
-            Console.Write("Enter new StartDate (leave blank to keep current): ");
+            Console.Write($"Enter new StartDate (leave blank to keep current:({selectedProject.StartDate}): ");
             var newStartDate = Console.ReadLine();
 
-            Console.Write("Enter new EndDate (leave blank to keep current): ");
+            Console.Write($"Enter new EndDate (leave blank to keep current:({selectedProject.EndDate}): ");
             var newEndDate = Console.ReadLine();
 
-            Console.Write("Enter new Status-ID (1 = Not started, 2 = In Progress, 3 = Completed): ) (leave blank to keep current): ");
+            Console.Write($"Enter new Status-ID (1 = Not started, 2 = In Progress, 3 = Completed): ) (leave blank to keep current:({selectedProject.StatusId}): ");
             var newStatusId = Console.ReadLine();
 
-            Console.Write("Enter new Customer-ID (1 = Company A:, 2 = Companny B): (leave blank to keep current): ");
+            Console.Write($"Enter new Customer-ID (1 = Company A:, 2 = Companny B): (leave blank to keep current:({selectedProject.CustomerId}): ");
             var newCustomerId = Console.ReadLine();
 
-            Console.Write("Enter new Service ID: (1 = IT-Support:, 2 = Consulting): (leave blank to keep current): ");
+            Console.Write($"Enter new Service ID: (1 = IT-Support:, 2 = Consulting): (leave blank to keep current:({selectedProject.ServiceId}): ");
             var newServiceId = Console.ReadLine();
 
-            Console.Write("Enter New Project Manager (Employee ID): (1 = Anna : 2 = Johan)(leave blank to keep current): ");
+            Console.Write($"Enter New Project Manager (Employee ID): (1 = Anna : 2 = Johan)(leave blank to keep current:({selectedProject.EmployeeId}): ");
             var newEmployeeId = Console.ReadLine();
 
             // Skapa DTO med det nya värdet

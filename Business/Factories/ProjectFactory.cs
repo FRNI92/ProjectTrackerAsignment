@@ -26,7 +26,8 @@ public static class ProjectFactory
             StatusId = projectDto.StatusId,
             EmployeeId = projectDto.EmployeeId,
             CustomerId = projectDto.CustomerId,
-            ServiceId = projectDto.ServiceId,       
+            ServiceId = projectDto.ServiceId,
+            
             
         };
     }
@@ -58,6 +59,8 @@ public static class ProjectFactory
             
             ServiceId = projectEntity.ServiceId,
             ServiceName = projectEntity.Service?.Name ?? "No service",
+            ServicePrice = projectEntity.Service?.Price ?? 0, // Hämtar pris från ServiceEntity
+            ServiceDuration = projectEntity.Service?.Duration ?? 0, // Hämtar duration från ServiceEntity
         };
     }
 }

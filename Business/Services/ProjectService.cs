@@ -1,5 +1,4 @@
-﻿
-using Business.Dtos;
+﻿using Business.Dtos;
 using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
@@ -23,6 +22,26 @@ public class ProjectService : BaseService<ProjectEntity>, IProjectService
         _projectRepository = projectRepository;
     }
 
+    public async Task<ProjectDto> CreateProjectAsync(ProjectDto projectDto)
+    {
+        var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
+        if (selectedService == null)
+        {
+            throw new KeyNotFoundException("Service not found");
+        }
+
+        // Beräkna totalpris baserat på tjänstens pris och användarens valda duration
+        var totalPrice = selectedService.Price * projectDto.ServiceDuration;
+
+        // Mappa DTO till Entity
+        var entity = ProjectFactory.ToEntity(projectDto);
+        entity.TotalPrice = totalPrice; // Spara totalpriset i entiteten
+        entity.Duration = projectDto.ServiceDuration; // Spara duration
+
+        var createdEntity = await _projectRepository.CreateAsync(entity); // Spara projektet
+        return ProjectFactory.ToDto(createdEntity);
+    }
+
     public async Task<IEnumerable<ProjectDto>> GetAllProjectAsync()
     {
         var allProjects = await _projectRepository.GetAllAsync();
@@ -31,7 +50,6 @@ public class ProjectService : BaseService<ProjectEntity>, IProjectService
 
     }
 
-    // Den här metoden använder redan den gemensamma UpdateAsync från BaseService
     public async Task<ProjectDto> UpdateProjectAsync(ProjectDto projectDto)
     {
         // Hämta projektet
@@ -43,20 +61,19 @@ public class ProjectService : BaseService<ProjectEntity>, IProjectService
 
         // Uppdatera specifika fält för projektet
         fetcheduneditedProject.Name = string.IsNullOrWhiteSpace(projectDto.Name) ? fetcheduneditedProject.Name : projectDto.Name;
+        fetcheduneditedProject.Description = string.IsNullOrWhiteSpace(projectDto.Description) ? fetcheduneditedProject.Description: projectDto.Description;
+        fetcheduneditedProject.StartDate = projectDto.StartDate != DateTime.MinValue ? projectDto.StartDate : fetcheduneditedProject.StartDate;
+        fetcheduneditedProject.EndDate = projectDto.EndDate.HasValue ? projectDto.EndDate : fetcheduneditedProject.EndDate;
 
+        fetcheduneditedProject.StatusId = projectDto.StatusId != 0 ? projectDto.StatusId : fetcheduneditedProject.StatusId;
+        fetcheduneditedProject.CustomerId = projectDto.CustomerId != 0 ? projectDto.CustomerId : fetcheduneditedProject.CustomerId;
+        fetcheduneditedProject.ServiceId = projectDto.ServiceId != 0 ? projectDto.ServiceId : fetcheduneditedProject.ServiceId;
+        fetcheduneditedProject.EmployeeId = projectDto.EmployeeId != 0 ? projectDto.EmployeeId : fetcheduneditedProject.EmployeeId;
         // Skicka med både lambda-uttryck och den uppdaterade entiteten
         var updatedProject = await UpdateAsync(p => p.Id == projectDto.Id, fetcheduneditedProject);
 
         // Returnera den uppdaterade projektet som DTO
         return ProjectFactory.ToDto(updatedProject);
-    }
-
-    // Den här metoden använder redan den gemensamma CreateAsync från BaseService
-    public async Task<ProjectDto> CreateProjectAsync(ProjectDto projectDto)
-    {
-        var entity = ProjectFactory.ToEntity(projectDto); // Mappa DTO till Entity
-        var createdEntity = await CreateAsync(entity); // Skapa entitet
-        return ProjectFactory.ToDto(createdEntity); // Mappa tillbaka till DTO  
     }
   
     public async Task DeleteProjectAsync(ProjectDto projectDto) // Använd samma GetAsync och DeleteAsync från BaseService här också

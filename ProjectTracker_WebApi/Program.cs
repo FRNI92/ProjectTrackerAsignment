@@ -11,10 +11,12 @@ builder.Services.AddOpenApi();
 //inmemory database 
 builder.Services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("TestDB"));
 builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<StatusService>();
 
 
 //builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("Data Source=localhost;Initial Catalog=sql_database;Integrated Security=True;Encrypt=True;Trust Server Certificate=True"));
 builder.Services.AddScoped<IRolesRepository, RolesRepository>();
+builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 
 
 //builder.Services.AddScoped<EmployeeService>();

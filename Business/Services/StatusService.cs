@@ -39,7 +39,6 @@ public class StatusService(IStatusRepository statusRepository)
         }
     }
 
-
     public async Task<IEnumerable<StatusDto>> ReadStatusAsync()
     {
         try
@@ -59,7 +58,7 @@ public class StatusService(IStatusRepository statusRepository)
         catch (Exception ex)
         {
             Console.WriteLine($"There was a problem with getting statuses:{ex.Message}");
-            Console.WriteLine(ex.StackTrace)
+            Console.WriteLine(ex.StackTrace);
             throw;
         }
     }
