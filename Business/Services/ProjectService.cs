@@ -13,33 +13,41 @@ using System.Linq.Expressions;
 
 namespace Business.Services;
 
-public class ProjectService : BaseService<ProjectEntity>, IProjectService
+public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
 
-    public ProjectService(IProjectRepository projectRepository) : base(projectRepository)
+    public ProjectService(IProjectRepository projectRepository)
     {
         _projectRepository = projectRepository;
     }
 
-    public async Task<ProjectDto> CreateProjectAsync(ProjectDto projectDto)
+    public async Task<IResult> CreateProjectAsync(ProjectDto projectDto)
     {
-        var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
-        if (selectedService == null)
+        if (projectDto == null)
+            return Result.BadRequest("Invalid project Data transfer object");
+        try
         {
-            throw new KeyNotFoundException("Service not found");
+            var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
+            if (selectedService == null)
+            {
+                return Result.NotFound("Could not find a service with that service ID");
+            }
+            // Beräkna totalpris baserat på tjänstens pris och användarens valda duration
+            var totalPrice = selectedService.Price * projectDto.Duration;
+
+            var entity = ProjectFactory.ToEntity(projectDto);
+            entity.TotalPrice = totalPrice; // Spara totalpriset i entiteten
+            entity.Duration = projectDto.Duration; // Spara duration
+
+            var result = await _projectRepository.CreateAsync(entity); // Spara projektet
+            return result ? Result.OK() : Result.Error("Unable To Create Project");
         }
-
-        // Beräkna totalpris baserat på tjänstens pris och användarens valda duration
-        var totalPrice = selectedService.Price * projectDto.Duration;
-
-        // Mappa DTO till Entity
-        var entity = ProjectFactory.ToEntity(projectDto);
-        entity.TotalPrice = totalPrice; // Spara totalpriset i entiteten
-        entity.Duration = projectDto.Duration; // Spara duration
-
-        var createdEntity = await _projectRepository.CreateAsync(entity); // Spara projektet
-        return ProjectFactory.ToDto(createdEntity);
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+            return Result.Error(ex.Message);
+        }
     }
 
     public async Task<IEnumerable<ProjectDto>> GetAllProjectAsync()
@@ -53,7 +61,7 @@ public class ProjectService : BaseService<ProjectEntity>, IProjectService
     public async Task<ProjectDto> UpdateProjectAsync(ProjectDto projectDto)
     {
         // Hämta projektet
-        var fetcheduneditedProject = await GetAsync(p => p.Id == projectDto.Id);
+        var fetcheduneditedProject = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
         if (fetcheduneditedProject == null)
         {
             throw new KeyNotFoundException("Project could not be found");
@@ -96,7 +104,7 @@ public class ProjectService : BaseService<ProjectEntity>, IProjectService
         fetcheduneditedProject.Duration = projectDto.Duration != 0 ? projectDto.Duration : fetcheduneditedProject.Duration;
         fetcheduneditedProject.EmployeeId = projectDto.EmployeeId != 0 ? projectDto.EmployeeId : fetcheduneditedProject.EmployeeId;
         // Skicka med både lambda-uttryck och den uppdaterade entiteten
-        var updatedProject = await UpdateAsync(p => p.Id == projectDto.Id, fetcheduneditedProject);
+        var updatedProject = await _projectRepository.UpdateAsync(p => p.Id == projectDto.Id, fetcheduneditedProject);
 
         // Returnera den uppdaterade projektet som DTO
         return ProjectFactory.ToDto(updatedProject);
@@ -104,13 +112,13 @@ public class ProjectService : BaseService<ProjectEntity>, IProjectService
   
     public async Task DeleteProjectAsync(ProjectDto projectDto) // Använd samma GetAsync och DeleteAsync från BaseService här också
     {
-        var project = await GetAsync(p => p.Id == projectDto.Id);
+        var project = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
         if (project == null)
         {
             throw new KeyNotFoundException("Project could not be found");
         }
 
-        await DeleteAsync(p => p.Id == projectDto.Id); // Använd DeleteAsync från BaseService
+        await _projectRepository.DeleteAsync(p => p.Id == projectDto.Id); // Använd DeleteAsync från BaseService
         Debug.WriteLine($"Project {projectDto.Id} deleted successfully.");
     }
 }

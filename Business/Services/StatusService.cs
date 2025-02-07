@@ -1,9 +1,12 @@
 ﻿using Business.Dtos;
 using Business.Factories;
+using Business.Interfaces;
+using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using System.Diagnostics;
 
 namespace Business.Services;
 
@@ -12,30 +15,30 @@ public class StatusService(IStatusRepository statusRepository)
     private readonly IStatusRepository _statusRepository = statusRepository;
 
     //CREATE
-    public async Task<StatusDto> CreateStatusAsync(StatusDto statusDto)
+    public async Task<IResult> CreateStatusAsync(StatusDto statusDto)
     {
         try
         {
             if (statusDto == null)
-                throw new ArgumentNullException(nameof(statusDto), "Status cannot be null.");
+                return Result.Error("status dto was not filled in correctly");
 
             var isExisting = await _statusRepository.DoesEntityExistAsync(s => s.Name == statusDto.Name);
             if (isExisting)
             {
-                Console.WriteLine("A status with that name already exists.");
-                throw new InvalidOperationException("A status with that name already exists.");
+                return Result.AlreadyExists("A status with that name already exists.");
             }
 
             var newStatusEntity = StatusFactory.ToEntity(statusDto);
             var createdStatusEntity = await _statusRepository.CreateAsync(newStatusEntity);
-
-            return StatusFactory.ToDto(createdStatusEntity);
+            if (createdStatusEntity)
+                return Result.OK();
+            return Result.Error("Could not create status correctly");
+            
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred when creating status: {ex.Message}");
-            Console.WriteLine(ex.StackTrace);
-            throw;
+            Debug.WriteLine($"An error occurred when creating status: {ex.Message}{ex.StackTrace}");
+            return Result.Error("There was a problem with server");
         }
     }
 

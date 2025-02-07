@@ -46,6 +46,5 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
             new ProjectEntity { Id = 1,ProjectNumber = "P-101", Name = "Projekt A", Description = "Första projektet", StartDate = new DateTime(2024, 1, 1), StatusId = 1, CustomerId = 1, ServiceId = 1, EmployeeId = 1, },
             new ProjectEntity { Id = 2,ProjectNumber = "P-102", Name = "Projekt B", Description = "Andra projektet", StartDate = new DateTime(2024, 1, 1), StatusId = 2, CustomerId = 2, ServiceId = 2, EmployeeId = 2, }
         );
-    }//"1 = Anna Andersson, 2 = Johan Johansson, 3 = Maria Karlsson"
-    //"1 = Company A, 2 = Company B, 3 = Company C"
+    }
 }

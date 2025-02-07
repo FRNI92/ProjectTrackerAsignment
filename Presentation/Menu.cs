@@ -1,5 +1,6 @@
 ﻿using Business.Dtos;
 using Business.Interfaces;
+using Business.Services;
 using Data.Entities;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,10 +9,13 @@ namespace Presentation;
 public class Menu
 {
     private readonly IProjectService _projectService;
+    private readonly EmployeeService _employeeService;
 
-    public Menu(IProjectService projectService)
+    public Menu(IProjectService projectService, EmployeeService employeeService)
     {
         _projectService = projectService;
+        _employeeService = employeeService;
+
     }
 
     public async Task ShowMenuAsync()
@@ -107,8 +111,18 @@ public class Menu
         Console.Write("Enter Status ID (1 = Not started, 2 = In Progress, 3 = Completed): ");
         newProject.StatusId = int.Parse(Console.ReadLine()!);
 
+        //Console.WriteLine("Select Project Manager:");
+        //Console.WriteLine("1 = Anna Andersson, 2 = Johan Johansson, 3 = Maria Karlsson");
+        //Console.Write("Enter Employee ID: ");
+        //newProject.EmployeeId = int.Parse(Console.ReadLine()!);
+        var employees = await _employeeService.GetAllEmployeesAsync();
+
         Console.WriteLine("Select Project Manager:");
-        Console.WriteLine("1 = Anna Andersson, 2 = Johan Johansson, 3 = Maria Karlsson");
+        foreach (var employee in employees)
+        {
+            Console.WriteLine($"{employee.Id} = {employee.FirstName} {employee.LastName}");
+        }
+
         Console.Write("Enter Employee ID: ");
         newProject.EmployeeId = int.Parse(Console.ReadLine()!);
 
@@ -126,7 +140,7 @@ public class Menu
 
 
         var createdProject = await _projectService.CreateProjectAsync(newProject);
-        Console.WriteLine($"Project created: {createdProject.Name} Total Price: {createdProject.TotalPrice} SEK");
+        Console.WriteLine($"Project created:");
         Console.ReadKey();
     }
 

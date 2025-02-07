@@ -43,7 +43,10 @@ serviceCollection.AddScoped<ICustomerRepository, CustomerRepository>();
 serviceCollection.AddScoped<ICustomerService, CustomerService>();
 
 serviceCollection.AddScoped<IProjectRepository, ProjectRepository>();//DI för rep och project
-serviceCollection.AddScoped<IProjectService, ProjectService>();
+serviceCollection.AddScoped<ProjectService>();
+
+serviceCollection.AddScoped<EmployeeService>();
+serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
 // Bygg service provider. här bygger den det jag definierat i collection
 var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -54,8 +57,9 @@ using var context = serviceProvider.GetRequiredService<DataContext>();
 // Här kan du använda context för att interagera med databasen
 Console.WriteLine("DataContext har konfigurerats!");
 
-var projectService = serviceProvider.GetRequiredService<IProjectService>();
-var menu = new Menu(projectService);
+var projectService = serviceProvider.GetRequiredService<ProjectService>();
+var employeeService = serviceProvider.GetRequiredService<EmployeeService>();
+var menu = new Menu(projectService, employeeService);
 
 await menu.ShowMenuAsync();
 

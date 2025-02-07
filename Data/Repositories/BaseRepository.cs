@@ -1,6 +1,7 @@
 ﻿using Data.Contexts;
 using Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace Data.Repositories;
@@ -10,26 +11,26 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     private readonly DataContext _context = context;
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
 
-    public virtual async Task<TEntity> CreateAsync(TEntity entity)
+    public virtual async Task<bool> CreateAsync(TEntity entity)
     {
         try
         {
             Console.WriteLine("Creating Something");
             if (entity == null)
             {
-                throw new ArgumentNullException(nameof(entity), $"{typeof(TEntity).Name} cannot be null.");
+                return false;
             }
             else
             {
                 await _dbSet.AddAsync(entity);
                 await _context.SaveChangesAsync();
-                return entity;
+                return true;
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error In CreateAsync:{ex.Message}");
-            throw;
+            Debug.Write($"Error In CreateAsync:{ex.Message}");
+            return false;
         }
     }
 

@@ -1,7 +1,10 @@
 ﻿using Business.Dtos;
 using Business.Factories;
+using Business.Interfaces;
+using Business.Models;
 using Data.Interfaces;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Diagnostics;
 using System.Linq.Expressions;
 namespace Business.Services;
 
@@ -9,25 +12,33 @@ public class RoleService(IRolesRepository rolesRepository)
 {
     private readonly IRolesRepository _rolesRepository = rolesRepository;
 
-    public async Task <RolesDto> CreateRolesAsync(RolesDto RolesDto)
+    public async Task <IResult> CreateRolesAsync(RolesDto RolesDto)
     {
         try
         {
             var exists = await _rolesRepository.DoesEntityExistAsync(r => r.Name == RolesDto.Name);
             if (exists)
             {
-                throw new ArgumentException("A role with this name already exists.");
+                return Result.Error("A role with this name already exists.");
             }
-            var newEntity = RoleFactory.ToEntity(RolesDto);
-            var createdEntity = await _rolesRepository.CreateAsync(newEntity);
 
-            return RoleFactory.ToDto(createdEntity);
+            var newEntity = RoleFactory.ToEntity(RolesDto);
+
+            var success = await _rolesRepository.CreateAsync(newEntity);
+
+            if (success)
+            {
+                return Result.OK(); // Returnera OK-status
+            }
+
+            return Result.Error("Failed to create role"); // Om något gick fel
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occured when creating role:{ex.Message}");
+            // Hantera fel och returnera ett felresultat
+            Debug.WriteLine($"An error occurred when creating role: {ex.Message}");
             Console.WriteLine(ex.StackTrace);
-            throw;
+            return Result.BadRequest("Could not create role");
         }
     }
 

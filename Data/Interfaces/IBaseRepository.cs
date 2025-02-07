@@ -4,7 +4,7 @@ namespace Data.Interfaces
 {
     public interface IBaseRepository<TEntity> where TEntity : class
     {
-        Task<TEntity> CreateAsync(TEntity entity);
+        Task<bool> CreateAsync(TEntity entity); // kan skicka flera värden <(bool, TEntity)>
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression);
 

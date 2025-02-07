@@ -1,8 +1,11 @@
 ﻿using Business.Dtos;
 using Business.Factories;
+using Business.Interfaces;
+using Business.Models;
 using Data.Interfaces;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Diagnostics;
 
 namespace Business.Services;
 
@@ -14,26 +17,26 @@ public class ServiceService
     {
         _serviceRepository = servicerepository;
     }
-    public async Task<ServiceDto> CreateServiceAsync(ServiceDto serviceDto)
+    public async Task<IResult> CreateServiceAsync(ServiceDto serviceDto)
     {
         try
         {
             if (serviceDto == null)
-                throw new ArgumentNullException(nameof(serviceDto), "Service data cannot be null.");
+                return Result.BadRequest("The service dto was not filled correctly");
 
             bool exists = await _serviceRepository.DoesEntityExistAsync(s => s.Name == serviceDto.Name);
             if (exists)
-                throw new InvalidOperationException("A Service with this Name already exists.");
+                return Result.AlreadyExists("Service with that name already exists");
 
             var newServiceEntity = ServiceFactory.ToEntity(serviceDto);
             var CreatedService = await _serviceRepository.CreateAsync(newServiceEntity);
 
-            return ServiceFactory.ToDto(CreatedService);
+            return Result.OK();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error With CreateServiceAsync{ex.Message}");
-            throw;
+            Debug.WriteLine($"Error With CreateServiceAsync{ex.Message}{ex.StackTrace}");
+            return Result.BadRequest("Something went wrong when creating service");
         }
     }
 

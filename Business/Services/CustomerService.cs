@@ -1,18 +1,20 @@
 ﻿using Business.Dtos;
 using Business.Factories;
 using Business.Interfaces;
+using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace Business.Services;
 
-public class CustomerService : BaseService<CustomerEntity>, ICustomerService
+public class CustomerService : ICustomerService
 {
     private readonly ICustomerRepository _customerRepository;
-    public CustomerService(ICustomerRepository customerRepository) : base(customerRepository)
+    public CustomerService(ICustomerRepository customerRepository)
     {
         _customerRepository = customerRepository;
     }
@@ -25,11 +27,23 @@ public class CustomerService : BaseService<CustomerEntity>, ICustomerService
         return customer.Select(customer => CustomerFactory.ToDto(customer)).ToList();
 
     }
-    public async Task<CustomerDto> CreateCustomerAsync(CustomerDto customerDto)
+    public async Task<IResult> CreateCustomerAsync(CustomerDto customerDto)
     {
-        var entity = CustomerFactory.ToEntity(customerDto); // Mappa DTO till Entity
-        var createdEntity = await _customerRepository.CreateAsync(entity); // Skapa entitet
-        return CustomerFactory.ToDto(createdEntity); // Mappa tillbaka till DTO
+        try
+        {
+            var entity = CustomerFactory.ToEntity(customerDto); // Mappa DTO till Entity
+            var result = await _customerRepository.CreateAsync(entity); // Skapa entitet
+            if (result) // Om skapandet lyckades
+            {
+                return Result.OK();
+            }
+            return Result.Error("Unable to create customer");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+            return Result.Error($"Error when creating customer: { ex.Message } {ex.StackTrace}");
+        }
     }
 
     public async Task<CustomerDto> UpdateCustomerAsync(CustomerDto customerDto)

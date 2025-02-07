@@ -1,5 +1,7 @@
 ﻿using Business.Dtos;
 using Business.Factories;
+using Business.Interfaces;
+using Business.Models;
 using Data.Interfaces;
 using Data.Repositories;
 using System.Diagnostics;
@@ -14,28 +16,33 @@ public class EmployeeService
     {
         _employeeRepository = employeeRepository;
     }
-    public async Task<EmployeeDto> CreateEmployeeAsync(EmployeeDto employeeDto)
+    public async Task<IResult> CreateEmployeeAsync(EmployeeDto employeeDto)
     {
         try
         {
             if (employeeDto == null)
-                throw new ArgumentNullException(nameof(employeeDto), "Employee data cannot be null.");
+            {
+                Result.BadRequest("Employee Dto was not filled in correcly");
+            }
 
             bool exists = await _employeeRepository.DoesEntityExistAsync(e => e.Email == employeeDto.Email);
             if (exists)
-                throw new InvalidOperationException("An employee with this email already exists.");
-
-            var newEmployeeEntity = EmployeeFactory.ToEntity(employeeDto);
-            var CreatedEmployee = await _employeeRepository.CreateAsync(newEmployeeEntity);
-
-            return EmployeeFactory.ToDto(CreatedEmployee);
+            {
+                return Result.AlreadyExists("An employee with this email already exists.");
+            }
+            else
+            {
+                var newEmployeeEntity = EmployeeFactory.ToEntity(employeeDto);
+                var CreatedEmployee = await _employeeRepository.CreateAsync(newEmployeeEntity);
+                return Result.OK();
+            }
         }
+
         catch (Exception ex)
         {
-            Console.WriteLine($"Error With CreateEmployeeAsync{ex.Message}");
-            throw;
+            Debug.WriteLine($"Error With CreateEmployeeAsync{ex.Message}{ex.StackTrace}");
+            return Result.Error("Something went wrong when creating Employee");
         }
-
     }
 
     public async Task<IEnumerable<EmployeeDto>> GetAllEmployeesAsync()
