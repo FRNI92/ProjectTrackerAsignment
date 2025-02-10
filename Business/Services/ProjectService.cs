@@ -73,68 +73,89 @@ public class ProjectService : IProjectService
         }
     }
 
-    public async Task<ProjectDto> UpdateProjectAsync(ProjectDto projectDto)
+    public async Task<IResult> UpdateProjectAsync(ProjectDto projectDto)
     {
-        // Hämta projektet
-        var fetcheduneditedProject = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
-        if (fetcheduneditedProject == null)
+        try
         {
-            throw new KeyNotFoundException("Project could not be found");
-        }
-
-        // 🔹 Hämta den nya tjänsten om ServiceId ändrats
-        if (projectDto.ServiceId != fetcheduneditedProject.ServiceId)
-        {
-            var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
-            if (selectedService == null)
+            //Hämta projektet
+            var fetcheduneditedProject = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
+            if (fetcheduneditedProject == null)
             {
-                throw new KeyNotFoundException("Service not found");
+                return Result.Error("An error occurred while loading the project.");
             }
 
-            // 🔹 Uppdatera tjänsten och priset
-            fetcheduneditedProject.ServiceId = projectDto.ServiceId;
-            fetcheduneditedProject.TotalPrice = selectedService.Price * fetcheduneditedProject.Duration;
-        }
-
-        // 🔹 Uppdatera durationen och räkna om priset om den ändrats
-        if (projectDto.Duration != 0 && projectDto.Duration != fetcheduneditedProject.Duration)
-        {
-            fetcheduneditedProject.Duration = projectDto.Duration;
-            var service = await _projectRepository.GetServiceByIdAsync(fetcheduneditedProject.ServiceId);
-            if (service != null)
+            //Hämta den nya tjänsten om ServiceId ändrats
+            if (projectDto.ServiceId != fetcheduneditedProject.ServiceId)
             {
-                fetcheduneditedProject.TotalPrice = service.Price * fetcheduneditedProject.Duration;
+                var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
+                if (selectedService == null)
+                {
+                    return Result.NotFound("cant find service with that ID");
+                }
+
+                //Uppdatera tjänsten och priset
+                fetcheduneditedProject.ServiceId = projectDto.ServiceId;
+                fetcheduneditedProject.TotalPrice = selectedService.Price * fetcheduneditedProject.Duration;
             }
+
+            //Uppdatera durationen och räkna om priset om den ändrats
+            if (projectDto.Duration != 0 && projectDto.Duration != fetcheduneditedProject.Duration)
+            {
+                fetcheduneditedProject.Duration = projectDto.Duration;
+                var service = await _projectRepository.GetServiceByIdAsync(fetcheduneditedProject.ServiceId);
+                if (service != null)
+                {
+                    fetcheduneditedProject.TotalPrice = service.Price * fetcheduneditedProject.Duration;
+                }
+            }
+
+            //Uppdatera specifika fält för projektet
+            fetcheduneditedProject.Name = string.IsNullOrWhiteSpace(projectDto.Name) ? fetcheduneditedProject.Name : projectDto.Name;
+            fetcheduneditedProject.Description = string.IsNullOrWhiteSpace(projectDto.Description) ? fetcheduneditedProject.Description : projectDto.Description;
+            fetcheduneditedProject.StartDate = projectDto.StartDate != DateTime.MinValue ? projectDto.StartDate : fetcheduneditedProject.StartDate;
+            fetcheduneditedProject.EndDate = projectDto.EndDate.HasValue ? projectDto.EndDate : fetcheduneditedProject.EndDate;
+            fetcheduneditedProject.StatusId = projectDto.StatusId != 0 ? projectDto.StatusId : fetcheduneditedProject.StatusId;
+            fetcheduneditedProject.CustomerId = projectDto.CustomerId != 0 ? projectDto.CustomerId : fetcheduneditedProject.CustomerId;
+            fetcheduneditedProject.ServiceId = projectDto.ServiceId != 0 ? projectDto.ServiceId : fetcheduneditedProject.ServiceId;
+            fetcheduneditedProject.Duration = projectDto.Duration != 0 ? projectDto.Duration : fetcheduneditedProject.Duration;
+            fetcheduneditedProject.EmployeeId = projectDto.EmployeeId != 0 ? projectDto.EmployeeId : fetcheduneditedProject.EmployeeId;
+            // Skicka med både lambda-uttryck och den uppdaterade entiteten
+            var updatedProject = await _projectRepository.UpdateAsync(p => p.Id == projectDto.Id, fetcheduneditedProject);
+
+            if (updatedProject == null)
+            {
+                return Result.Error("Unable to update project.");
+            }
+            //Omvandla den uppdaterade entiteten till DTO och returnera som resultat
+            var updatedProjectDto = ProjectFactory.ToDto(updatedProject);
+            return Result<ProjectDto>.OK(updatedProjectDto);
         }
-
-        // Uppdatera specifika fält för projektet
-        fetcheduneditedProject.Name = string.IsNullOrWhiteSpace(projectDto.Name) ? fetcheduneditedProject.Name : projectDto.Name;
-        fetcheduneditedProject.Description = string.IsNullOrWhiteSpace(projectDto.Description) ? fetcheduneditedProject.Description: projectDto.Description;
-        fetcheduneditedProject.StartDate = projectDto.StartDate != DateTime.MinValue ? projectDto.StartDate : fetcheduneditedProject.StartDate;
-        fetcheduneditedProject.EndDate = projectDto.EndDate.HasValue ? projectDto.EndDate : fetcheduneditedProject.EndDate;
-
-        fetcheduneditedProject.StatusId = projectDto.StatusId != 0 ? projectDto.StatusId : fetcheduneditedProject.StatusId;
-        fetcheduneditedProject.CustomerId = projectDto.CustomerId != 0 ? projectDto.CustomerId : fetcheduneditedProject.CustomerId;
-        fetcheduneditedProject.ServiceId = projectDto.ServiceId != 0 ? projectDto.ServiceId : fetcheduneditedProject.ServiceId;
-        fetcheduneditedProject.Duration = projectDto.Duration != 0 ? projectDto.Duration : fetcheduneditedProject.Duration;
-        fetcheduneditedProject.EmployeeId = projectDto.EmployeeId != 0 ? projectDto.EmployeeId : fetcheduneditedProject.EmployeeId;
-        // Skicka med både lambda-uttryck och den uppdaterade entiteten
-        var updatedProject = await _projectRepository.UpdateAsync(p => p.Id == projectDto.Id, fetcheduneditedProject);
-
-        // Returnera den uppdaterade projektet som DTO
-        return ProjectFactory.ToDto(updatedProject);
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Problem when updating project {ex.Message} {ex.StackTrace}");
+            return Result.Error("Problem when updating project");
+        }
     }
   
-    public async Task DeleteProjectAsync(ProjectDto projectDto) 
+    public async Task<IResult> DeleteProjectAsync(ProjectDto projectDto) 
     {
-        var project = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
-        if (project == null)
+        try
         {
-            throw new KeyNotFoundException("Project could not be found");
-        }
+            var project = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
+            if (project == null)
+            {
+                return Result.Error("Project could not be found");
+            }
 
-        await _projectRepository.DeleteAsync(p => p.Id == projectDto.Id); 
-        Debug.WriteLine($"Project {projectDto.Id} deleted successfully.");
+            await _projectRepository.DeleteAsync(p => p.Id == projectDto.Id);
+            Debug.WriteLine($"Project {projectDto.Id} deleted successfully.");
+            return Result.OK();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Could not Delete project{ex.Message} {ex.StackTrace}");
+            return Result.Error("Could not delete project");
+        }
     }
 }
 

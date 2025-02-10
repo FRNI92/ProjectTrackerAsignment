@@ -59,14 +59,14 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
             var entity = await _dbSet.FirstOrDefaultAsync(expression);
 
             if (entity == null)
-                throw new KeyNotFoundException("Entity not found");
+                return null!; 
 
             return entity;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error In GetAsync:{ex.Message}");
-            throw;
+            Debug.WriteLine($"Error In GetAsync:{ex.Message} {ex.StackTrace}");
+            return null!;
         }
     }
 
@@ -87,7 +87,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         catch (Exception ex)
         {
             Console.WriteLine($"Error in UpdateAsync:{ex.Message}");
-            throw;
+            return null!;
         }
 
     }
@@ -107,7 +107,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         catch (Exception ex)
         {
             Console.WriteLine($"Error With DeleteAsync{ex.Message}");
-            throw;
+            return false;
         }
     }
 
@@ -119,8 +119,8 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error with DoesEntityExistAsync{ex.Message}");
-            throw;
+            Debug.WriteLine($"Error with DoesEntityExistAsync{ex.Message}");
+            return false;
         }
     }
 }
