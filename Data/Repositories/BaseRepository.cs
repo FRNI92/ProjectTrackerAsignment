@@ -38,13 +38,16 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     {
         try
         {
-            Console.WriteLine("BaseRepository: Fetching all entities In...");
-            return await _dbSet.ToListAsync();
+            var allProject = await _dbSet.ToListAsync();
+            if (allProject == null)
+                return null!;
+            Debug.WriteLine("BaseRepository: Fetching all entities In...");
+            return allProject;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error In GetAllAsync:{ex.Message}");
-            throw;
+            Debug.WriteLine($"Error In GetAllAsync:{ex.Message} {ex.StackTrace}");
+            return null!;
         }
     }
 

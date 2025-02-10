@@ -1,5 +1,6 @@
 ﻿using Business.Dtos;
 using Business.Interfaces;
+using Business.Models;
 using Business.Services;
 using Data.Entities;
 using System.ComponentModel.DataAnnotations;
@@ -58,24 +59,37 @@ public class Menu
     private async Task ShowProjectsPreviewAsync()
     {
         Console.Clear();
-        Console.WriteLine("DEBUG: ShowProjectsPreviewAsync() körs");
+        Console.WriteLine("DEBUG: ShowProjectsPreviewAsync körs");
 
-        var Projects = await _projectService.GetAllProjectAsync();
-        Console.WriteLine($"DEBUG: Antal projekt i listan: {Projects.Count()}");
+        // Hämta resultatet från din service
+        var result = await _projectService.GetAllProjectAsync();
 
-
-        foreach (var project in Projects)
+        // Kontrollera om resultatet är framgångsrikt och hämta datan
+        if (result is Result<IEnumerable<ProjectDto>> projectResult)
         {
-            Console.WriteLine($"Project ID:{project.Id}");
-            Console.WriteLine($"Project Number:{project.ProjectNumber}");
-            Console.WriteLine($"Name: {project.Name}");
-            Console.WriteLine($"Time Period: {project.StartDate} - {project.EndDate}");
-            Console.WriteLine($"Current Status: {project.StatusName}");
-            Console.WriteLine();
+            // Om resultatet är av typen Result<IEnumerable<ProjectDto>>, kommer det att konverteras till projectResult
+            var projects = projectResult.Data;  // Här får du tillgång till Data
+            Console.WriteLine($"DEBUG: Antal projekt i listan: {projects.Count()}");
+
+            // Iterera genom projekten och skriv ut information
+            foreach (var project in projects)
+            {
+                Console.WriteLine($"Project ID: {project.Id}");
+                Console.WriteLine($"Project Number: {project.ProjectNumber}");
+                Console.WriteLine($"Name: {project.Name}");
+                Console.WriteLine($"Time Period: {project.StartDate} - {project.EndDate}");
+                Console.WriteLine($"Current Status: {project.StatusName}");
+                Console.WriteLine();
+            }
         }
+        else
+        {
+            // Om det inte finns några projekt, eller om det är något fel
+            Console.WriteLine("No projects found.");
+        }
+
         Console.WriteLine("\nPress any key to return to the menu...");
         Console.ReadKey();
-    
     }
 
 
@@ -114,7 +128,7 @@ public class Menu
         //Console.WriteLine("Select Project Manager:");
         //Console.WriteLine("1 = Anna Andersson, 2 = Johan Johansson, 3 = Maria Karlsson");
         //Console.Write("Enter Employee ID: ");
-        //newProject.EmployeeId = int.Parse(Console.ReadLine()!);
+        //newProject.EmployeeId = int.Parse(Console.ReadLine()!); var bättre att foreacha än ha "hårdkoda" valen i menyn
         var employees = await _employeeService.GetAllEmployeesAsync();
 
         Console.WriteLine("Select Project Manager:");

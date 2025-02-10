@@ -50,12 +50,27 @@ public class ProjectService : IProjectService
         }
     }
 
-    public async Task<IEnumerable<ProjectDto>> GetAllProjectAsync()
+    public async Task<IResult> GetAllProjectAsync()
     {
-        var allProjects = await _projectRepository.GetAllAsync();
+        try
+        {
+            var allProjects = await _projectRepository.GetAllAsync();
+            if (allProjects.Any())
+            {
+                var projectDtos = allProjects.Select(ProjectFactory.ToDto).ToList();
+                return Result<IEnumerable<ProjectDto>>.OK(projectDtos);
+            }
 
-        return allProjects.Select(ProjectFactory.ToDto).ToList();
-
+            else
+            {
+                return Result.NotFound("Could not find any project");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"There was an error when using GetAllAsync {ex.Message} {ex.StackTrace}");
+            return Result.Error("There was an error when getting the projects");
+        }
     }
 
     public async Task<ProjectDto> UpdateProjectAsync(ProjectDto projectDto)
@@ -110,7 +125,7 @@ public class ProjectService : IProjectService
         return ProjectFactory.ToDto(updatedProject);
     }
   
-    public async Task DeleteProjectAsync(ProjectDto projectDto) // Använd samma GetAsync och DeleteAsync från BaseService här också
+    public async Task DeleteProjectAsync(ProjectDto projectDto) 
     {
         var project = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
         if (project == null)
@@ -118,7 +133,7 @@ public class ProjectService : IProjectService
             throw new KeyNotFoundException("Project could not be found");
         }
 
-        await _projectRepository.DeleteAsync(p => p.Id == projectDto.Id); // Använd DeleteAsync från BaseService
+        await _projectRepository.DeleteAsync(p => p.Id == projectDto.Id); 
         Debug.WriteLine($"Project {projectDto.Id} deleted successfully.");
     }
 }
