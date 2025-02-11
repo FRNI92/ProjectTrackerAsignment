@@ -13,10 +13,10 @@ namespace Business.Interfaces
     /// <param name="customerDto"></param>
     /// <returns></returns>
         Task<IResult> CreateCustomerAsync(CustomerDto customerDto);
-        Task<IEnumerable<CustomerDto>> GetAllAsync();
+        Task<IResult> GetAllCustomerAsync();
 
-        Task<CustomerDto> UpdateCustomerAsync(CustomerDto customerDto);
+        Task<IResult> UpdateCustomerAsync(CustomerDto customerDto);
 
-        Task<bool> DeleteCustomerAsync(CustomerDto customerDto);
+        Task<IResult> DeleteCustomerAsync(CustomerDto customerDto);
     }
 }

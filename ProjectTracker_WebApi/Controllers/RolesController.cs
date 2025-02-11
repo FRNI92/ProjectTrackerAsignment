@@ -1,4 +1,5 @@
 ﻿using Business.Dtos;
+using Business.Models;
 using Business.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,13 @@ public class RolesController(RoleService rolesService) : ControllerBase
         try
         {
             var createdRole = await _rolesService.CreateRolesAsync(newRole);
-            return CreatedAtAction(nameof(GetRoleById), new { id = createdRole.Id }, createdRole);
+            if (createdRole is Result<RolesDto> okResult)
+            {
+                var projects = okResult.Data;
+                // Om resultatet är OK, returnera det skapade objektet
+                return CreatedAtAction(nameof(GetRoleById), new { id = okResult.Data.Id }, okResult.Data.Name);
+            }
+            return BadRequest("was not able to create role");
         }
         catch (ArgumentException ex)  // Fångar specifika fel från service
         {

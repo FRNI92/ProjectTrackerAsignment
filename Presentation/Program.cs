@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Presentation;
+using Presentation.MenuDialogs;
 using System;
 
 //controller
@@ -40,27 +41,24 @@ serviceCollection.AddDbContext<DataContext>(options =>
 
 
 serviceCollection.AddScoped<ICustomerRepository, CustomerRepository>();
-serviceCollection.AddScoped<ICustomerService, CustomerService>();
-
-serviceCollection.AddScoped<IProjectRepository, ProjectRepository>();//DI för rep och project
+serviceCollection.AddScoped<ICustomerService, CustomerService>(); // Här registreras CustomerService
+serviceCollection.AddScoped<IProjectRepository, ProjectRepository>();
+serviceCollection.AddScoped<IProjectService, ProjectService>();
 serviceCollection.AddScoped<ProjectService>();
-
 serviceCollection.AddScoped<EmployeeService>();
 serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
-// Bygg service provider. här bygger den det jag definierat i collection
+// Registrera dina meny-dialoger
+serviceCollection.AddScoped<ProjectMenuDialogs>();
+serviceCollection.AddScoped<CustomerMenuDialogs>();
+serviceCollection.AddScoped<MainMenu>();  // Registrera MainMenu
+
+// Bygg service provider
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-// Hämta en instans av DataContext från service provider. det jag definierat i collection och byggt i builder anropas här
-using var context = serviceProvider.GetRequiredService<DataContext>();
+// Hämta en instans av MainMenu från service provider
+var mainMenu = serviceProvider.GetRequiredService<MainMenu>();
+await mainMenu.ShowMainMenuAsync();
 
-// Här kan du använda context för att interagera med databasen
-Console.WriteLine("DataContext har konfigurerats!");
-
-var projectService = serviceProvider.GetRequiredService<ProjectService>();
-var employeeService = serviceProvider.GetRequiredService<EmployeeService>();
-var menu = new Menu(projectService, employeeService);
-
-await menu.ShowMenuAsync();
 
 

@@ -28,7 +28,7 @@ public class RoleService(IRolesRepository rolesRepository)
 
             if (success)
             {
-                return Result.OK(); // Returnera OK-status
+                return Result<RolesDto>.OK(); // Returnera OK-status
             }
 
             return Result.Error("Failed to create role"); // Om något gick fel
