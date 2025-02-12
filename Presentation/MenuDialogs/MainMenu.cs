@@ -4,10 +4,12 @@ public class MainMenu
 {
     private readonly ProjectMenuDialogs _projectMenuDialogs;
     private readonly CustomerMenuDialogs _customerMenuDialogs;
-    public MainMenu(ProjectMenuDialogs projectMenuDialogs, CustomerMenuDialogs customerMenuDialogs)
+    private readonly EmployeeMenuDialogs _employeeMenuDialogs;
+    public MainMenu(ProjectMenuDialogs projectMenuDialogs, CustomerMenuDialogs customerMenuDialogs, EmployeeMenuDialogs employeeMenuDialogs)
     {
         _projectMenuDialogs = projectMenuDialogs;
         _customerMenuDialogs = customerMenuDialogs;
+        _employeeMenuDialogs = employeeMenuDialogs;
     }
 
     public async Task ShowMainMenuAsync()
@@ -38,7 +40,7 @@ public class MainMenu
                     break;
 
                 case "3":
-                    await _EmployeeMenuDialogs.ShowEmployeeMenu();
+                    await _employeeMenuDialogs.ShowEmployeeMenuAsync();
                     break;
 
                 case "0":

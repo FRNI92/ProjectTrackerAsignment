@@ -8,9 +8,9 @@ namespace Presentation.MenuDialogs;
 public class ProjectMenuDialogs
 {
     private readonly IProjectService _projectService;
-    private readonly EmployeeService _employeeService;
+    private readonly IEmployeeService _employeeService;
 
-    public ProjectMenuDialogs(IProjectService projectService, EmployeeService employeeService)
+    public ProjectMenuDialogs(IProjectService projectService, IEmployeeService employeeService)
     {
         _projectService = projectService;
         _employeeService = employeeService;
@@ -123,38 +123,48 @@ public class ProjectMenuDialogs
         Console.Write("Enter Status ID (1 = Not started, 2 = In Progress, 3 = Completed): ");
         newProject.StatusId = int.Parse(Console.ReadLine()!);
 
-        //Console.WriteLine("Select Project Manager:");
-        //Console.WriteLine("1 = Anna Andersson, 2 = Johan Johansson, 3 = Maria Karlsson");
-        //Console.Write("Enter Employee ID: ");
-        //newProject.EmployeeId = int.Parse(Console.ReadLine()!); var bättre att foreacha än ha "hårdkoda" valen i menyn
-        var employees = await _employeeService.GetAllEmployeesAsync();
 
-        Console.WriteLine("Select Project Manager:");
-        foreach (var employee in employees)
+        var employeesResult = await _employeeService.GetEmployeeAsync();
+
+        if (employeesResult is Result<IEnumerable<EmployeeDto>> employeeResult && employeeResult.Success)
         {
-            Console.WriteLine($"{employee.Id} = {employee.FirstName} {employee.LastName}");
+            var employees = employeeResult.Data.ToList();
+
+            if (!employees.Any())
+            {
+                Console.WriteLine("No employees found.");
+                Console.WriteLine("\nPress any key to return to the menu...");
+                Console.ReadKey();
+                return;
+            }
+            Console.WriteLine("Select Project Manager:");
+            foreach (var employee in employees)
+            {
+                Console.WriteLine($"{employee.Id} = {employee.FirstName} {employee.LastName}");
+            }
+
+            Console.Write("Enter Employee ID: ");
+            newProject.EmployeeId = int.Parse(Console.ReadLine()!);
+
+            Console.WriteLine("Select Customer (Company who ordered the project):");
+            Console.WriteLine("1 = Company A, 2 = Company B, 3 = Company C");
+            Console.Write("Enter Customer ID: ");
+            newProject.CustomerId = int.Parse(Console.ReadLine()!);
+
+            Console.Write("Enter Service ID: (1 = IT-Support:, 2 = Consulting):");
+            newProject.ServiceId = int.Parse(Console.ReadLine()!);
+
+            Console.Write("Enter Duration (in hours): ");
+            newProject.Duration = decimal.Parse(Console.ReadLine()!);
+
+
+
+            var createdProject = await _projectService.CreateProjectAsync(newProject);
+            Console.WriteLine($"Project created:");
+            Console.ReadKey();
         }
-
-        Console.Write("Enter Employee ID: ");
-        newProject.EmployeeId = int.Parse(Console.ReadLine()!);
-
-        Console.WriteLine("Select Customer (Company who ordered the project):");
-        Console.WriteLine("1 = Company A, 2 = Company B, 3 = Company C");
-        Console.Write("Enter Customer ID: ");
-        newProject.CustomerId = int.Parse(Console.ReadLine()!);
-
-        Console.Write("Enter Service ID: (1 = IT-Support:, 2 = Consulting):");
-        newProject.ServiceId = int.Parse(Console.ReadLine()!);
-
-        Console.Write("Enter Duration (in hours): ");
-        newProject.Duration = decimal.Parse(Console.ReadLine()!);
-
-
-
-        var createdProject = await _projectService.CreateProjectAsync(newProject);
-        Console.WriteLine($"Project created:");
-        Console.ReadKey();
     }
+    
 
     private async Task UpdateProjectAsync()
     {

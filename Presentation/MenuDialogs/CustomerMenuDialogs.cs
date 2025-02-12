@@ -160,7 +160,7 @@ public class CustomerMenuDialogs
         }
     }
 
-    private async Task DeleteCustomerAsync()
+    private  static async Task DeleteCustomerAsync()
     {
 
     }

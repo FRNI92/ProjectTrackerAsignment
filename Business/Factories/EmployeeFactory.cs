@@ -21,11 +21,12 @@ public static class EmployeeFactory
     {
         return new EmployeeDto
         {
-            Id= employeesEntity.Id,
+            Id = employeesEntity.Id,
             FirstName = employeesEntity.FirstName,
             LastName = employeesEntity.LastName,
             Email = employeesEntity.Email,
-            RoleId= employeesEntity.RoleId
+            RoleId = employeesEntity.RoleId,
+            RoleName = employeesEntity.Role.Name,
         };
     }
 }

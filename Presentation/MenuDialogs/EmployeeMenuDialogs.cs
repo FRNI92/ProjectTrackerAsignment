@@ -39,7 +39,7 @@ public class EmployeeMenuDialogs
                     await CreateEmployeeAsync();
                     break;
                 case "3":
-                    await UpdateEmployeetAsync();
+                    await UpdateEmployeeAsync();
                     break;
                 case "4":
                     await DeleteEmployeeAsync();
@@ -113,9 +113,142 @@ public class EmployeeMenuDialogs
         Console.ReadKey();
     }
 
+    private async Task UpdateEmployeeAsync()
+    {
+        Console.Clear();
+        Console.WriteLine("This Is The Employee List:");
 
+        // Hämta alla kunder
+        var employees = await _employeeService.GetEmployeeAsync();
 
- }
+        if (employees is Result<IEnumerable<EmployeeDto>> employeeResult && employeeResult.Success)
+        {
+            var employeesData = employeeResult.Data;
+
+            if (!employeesData.Any())
+            {
+                Console.WriteLine("No Employees found.");
+                Console.WriteLine("\nPress any key to return to the menu...");
+                Console.ReadKey();
+                return;
+            }
+
+            // Visa alla kunder
+            int index = 1;
+            foreach (var employee in employeesData)
+            {
+                Console.WriteLine($"{index}.Employee: {employee.FirstName}\t Name: {employee.LastName}");
+                Console.WriteLine($"Current Email: {employee.Email}");
+                Console.WriteLine($"Customer Role: {employee.RoleName}");
+                Console.WriteLine("------------------------------------");
+                index++;
+            }
+
+            Console.WriteLine("----Which Employee Would You Like To Update? Enter the number:");
+
+            // Låt användaren välja en kund
+            if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= employeesData.Count())
+            {
+                var selectedEmployee = employeesData.ElementAt(choice - 1); //hämta vald kund
+                Console.Write($"Enter new first name (leave blank to keep current:({selectedEmployee.FirstName}): ");
+                var newFirstName = Console.ReadLine();
+                Console.Write($"Enter new last name(leave blank to keep current:({selectedEmployee.LastName}): ");
+                var newLastName = Console.ReadLine();
+                Console.Write($"Enter new Email (leave blank to keep current:({selectedEmployee.Email}): ");
+                var newEmail = Console.ReadLine();
+                Console.Write($"Enter new Role (leave blank to keep current:({selectedEmployee.RoleId}): ");
+                var newRoleId= Console.ReadLine();
+
+                var updatedEmployee = new EmployeeDto
+                {
+                    Id = selectedEmployee.Id, // Skicka ID:t istället för att söka med namn
+                    FirstName = string.IsNullOrWhiteSpace(newFirstName) ? selectedEmployee.FirstName : newFirstName,//tom eller null behåll gamla : annar newName
+                    LastName = string.IsNullOrWhiteSpace(newLastName) ? selectedEmployee.LastName: newLastName,
+                    Email = string.IsNullOrWhiteSpace(newEmail) ? selectedEmployee.Email: (newEmail),
+                    RoleId = string.IsNullOrWhiteSpace(newRoleId) ? selectedEmployee.RoleId: int.Parse(newRoleId)
+                };
+
+                await _employeeService.UpdateEmployeeAsync(updatedEmployee.Id, updatedEmployee);
+                Console.WriteLine("\nCustomer updated successfully!");
+                Console.WriteLine("\nPress any key to return to the menu...");
+                Console.ReadKey();
+            }
+        }
+    }
+
+    public async Task DeleteEmployeeAsync()
+    {
+        Console.Clear();
+        Console.WriteLine("\tEMPLOYEE-MANAGER");
+        Console.WriteLine("\tDelete Employee");
+
+        Console.WriteLine("This Is The Employee List:");
+
+        // Hämta alla projekt
+        var employeesResult = await _employeeService.GetEmployeeAsync();
+
+        if (employeesResult is Result<IEnumerable<EmployeeDto>> employeeResult && employeeResult.Success)
+        {
+            var employees = employeeResult.Data.ToList();
+
+            if (!employees.Any())
+            {
+                Console.WriteLine("No employees found.");
+                Console.WriteLine("\nPress any key to return to the menu...");
+                Console.ReadKey();
+                return;
+            }
+
+            // Visa alla kunder
+            int index = 1;
+            foreach (var employee in employees)
+            {
+                Console.WriteLine($"{index}. Name: {employee.FirstName}, Email: {employee.Email}");
+                index++;
+            }
+
+            Console.WriteLine("----Which Employee Would You Like To Delete?");
+            if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= employees.Count())
+            {
+                var selectedEmployee = employees.ElementAt(choice - 1);
+
+                // Be om bekräftelse innan radering
+                Console.WriteLine($"Are you sure you want to delete this employee: {selectedEmployee.FirstName}? (y/n)");
+                var confirmation = Console.ReadLine();
+
+                if (confirmation?.ToLower() == "y")
+                {
+                    Console.WriteLine($"Deleting project: {selectedEmployee.FirstName}");
+
+                    try
+                    {
+                        await _employeeService.DeleteEmployeeByIdAsync(selectedEmployee.Id);
+                        Console.WriteLine("Project deleted successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to delete the Project. Error: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Employee deletion cancelled.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Failed to load employees or no employees available.");
+        }
+        Console.WriteLine("\nPress any key to return to the menu...");
+        Console.ReadKey();
+    }
+
+}
 
 
 

@@ -45,12 +45,13 @@ serviceCollection.AddScoped<ICustomerService, CustomerService>(); // Här regist
 serviceCollection.AddScoped<IProjectRepository, ProjectRepository>();
 serviceCollection.AddScoped<IProjectService, ProjectService>();
 serviceCollection.AddScoped<ProjectService>();
-serviceCollection.AddScoped<EmployeeService>();
+serviceCollection.AddScoped<IEmployeeService, EmployeeService>();
 serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
 // Registrera dina meny-dialoger
 serviceCollection.AddScoped<ProjectMenuDialogs>();
 serviceCollection.AddScoped<CustomerMenuDialogs>();
+serviceCollection.AddScoped<EmployeeMenuDialogs>();
 serviceCollection.AddScoped<MainMenu>();  // Registrera MainMenu
 
 // Bygg service provider
