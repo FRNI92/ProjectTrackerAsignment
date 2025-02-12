@@ -6,12 +6,16 @@ public class MainMenu
     private readonly CustomerMenuDialogs _customerMenuDialogs;
     private readonly EmployeeMenuDialogs _employeeMenuDialogs;
     private readonly RoleMenuDialog _roleMenuDialog;
-    public MainMenu(ProjectMenuDialogs projectMenuDialogs, CustomerMenuDialogs customerMenuDialogs, EmployeeMenuDialogs employeeMenuDialogs, RoleMenuDialog roleMenuDialog)
+    private readonly StatusMenuDiallogs _statusMenuDiallogs;
+    private readonly ServiceMenuDialogs _serviceMenuDialogs;
+    public MainMenu(ProjectMenuDialogs projectMenuDialogs, CustomerMenuDialogs customerMenuDialogs, EmployeeMenuDialogs employeeMenuDialogs, RoleMenuDialog roleMenuDialog, StatusMenuDiallogs statusMenuDiallogs, ServiceMenuDialogs serviceMenuDialogs)
     {
         _projectMenuDialogs = projectMenuDialogs;
         _customerMenuDialogs = customerMenuDialogs;
         _employeeMenuDialogs = employeeMenuDialogs;
         _roleMenuDialog = roleMenuDialog;
+        _statusMenuDiallogs = statusMenuDiallogs;
+        _serviceMenuDialogs = serviceMenuDialogs;
     }
 
     public async Task ShowMainMenuAsync()
@@ -23,8 +27,8 @@ public class MainMenu
             Console.WriteLine("2. Manage Customers");
             Console.WriteLine("3. Manage Employees");
             Console.WriteLine("4. Manage Roles");
-            //Console.WriteLine("5. Manage Servicec");ska läggas till
-            //Console.WriteLine("6. Manage Statuses");
+            Console.WriteLine("5. Manage Statuses");
+            Console.WriteLine("6. Manage Services");
 
             Console.WriteLine("0. Exit");
 
@@ -47,6 +51,14 @@ public class MainMenu
 
                 case "4":
                     await _roleMenuDialog.ShowRolesMenu();
+                    break;
+
+                case "5":
+                    await _statusMenuDiallogs.ShowStatusMenu();
+                    break;
+
+                case "6":
+                    await _serviceMenuDialogs.ShowServicesMenu();
                     break;
                 case "0":
                         return;

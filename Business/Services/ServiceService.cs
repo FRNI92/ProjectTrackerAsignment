@@ -40,57 +40,55 @@ public class ServiceService
         }
     }
 
-    public async Task<IEnumerable<ServiceDto>> ReadServiceAsync()
+    public async Task<IResult> ReadServiceAsync()
     {
         try
         {
             var serviceList = await _serviceRepository.GetAllAsync();
             if (!serviceList.Any())
-            {
-                Console.WriteLine("No Services found.");
-                return [];
-            }
 
-            var convertedList = serviceList.Select(ServiceFactory.ToDto);
-            return convertedList;
+                return Result.NotFound("could not find any services");
+            
+
+            var convertedList = serviceList.Select(ServiceFactory.ToDto).ToList();
+            return Result<IEnumerable<ServiceDto>>.OK(convertedList);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occured when Reading Services: {ex.Message}");
-            Console.WriteLine(ex.StackTrace);
-            throw;
+            Debug.WriteLine($"An error occured when Reading Services: {ex.Message}{ex.StackTrace}");
+            return Result.Error("There was an error when reading services");
         }
     }
 
 
-    public async Task<ServiceDto> UpdateServiceAsync(ServiceDto serviceDto)
+    public async Task<IResult> UpdateServiceAsync(ServiceDto serviceDto)
     {
         try
         {
             if (serviceDto == null)
-                throw new ArgumentNullException(nameof(serviceDto), "Service data cannot be null.");
+                return Result.BadRequest("serviceDto cant be empty");
 
             var existingEntity = await _serviceRepository.GetAsync(s => s.Id == serviceDto.Id);
             if (existingEntity == null)
             {
-                throw new InvalidOperationException("Could not find the entity to update.");
+                return Result.NotFound("Could not find the service to update");
             }
             else
             {
                 ServiceFactory.UpdateEntity(existingEntity, serviceDto);
-                await _serviceRepository.UpdateAsync(s => s.Id == serviceDto.Id, existingEntity);
-                return ServiceFactory.ToDto(existingEntity);
+                var updatedService = await _serviceRepository.UpdateAsync(s => s.Id == serviceDto.Id, existingEntity);
+                var servuceToMenu = ServiceFactory.ToDto(updatedService);
+                return Result<ServiceDto>.OK(servuceToMenu);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred when updating the service: {ex.Message}");
-            Console.WriteLine(ex.StackTrace);
-            throw;
+            Console.WriteLine($"An error occurred when updating the service: {ex.Message}{ex.StackTrace}");
+            return Result.Error("There was an error when updating servicec");
         }
     }
 
-    public async Task <bool> DeleteServiceEntity(int id)
+    public async Task <IResult> DeleteServiceEntity(int id)
     {
         try
         {
@@ -99,11 +97,12 @@ public class ServiceService
             if (!exists)
             {
                 Console.WriteLine("Service not found.");
-                return false;
+                return Result.NotFound("Could not find the service");
             }
             else
             {
-                return await _serviceRepository.DeleteAsync(s => s.Id == id);
+                var serviceResult = await _serviceRepository.DeleteAsync(s => s.Id == id);
+                return Result.OK();
             }
         }
         catch (Exception ex)
