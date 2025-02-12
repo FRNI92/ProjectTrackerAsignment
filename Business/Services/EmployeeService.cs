@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Business.Services;
 
-public class EmployeeService
+public class EmployeeService : IEmployeeService
 {
     private readonly IEmployeeRepository _employeeRepository;
 
@@ -45,77 +45,111 @@ public class EmployeeService
         }
     }
 
-    public async Task<IEnumerable<EmployeeDto>> GetAllEmployeesAsync()
+    public async Task<IResult> GetEmployeeAsync()
     {
         try
         {
-            var employees = await _employeeRepository.GetAllAsync();
-            return employees.Select(EmployeeFactory.ToDto);
+            var allEmployees = await _employeeRepository.GetAllAsync();
+            if (allEmployees.Any())
+            {
+                var employeeDto = allEmployees.Select(EmployeeFactory.ToDto).ToList();
+                return Result<IEnumerable<EmployeeDto>>.OK(employeeDto);
+            }
+            else
+            {
+                return Result.NotFound("Could not find any employees");
+            }
+
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"There was an error getting employees{ex.Message}");
-            throw;
+            Debug.WriteLine($"There was an error getting employees{ex.Message}{ex.StackTrace}");
+            return Result.Error($"There was an error when getting Employees{ex.Message}");
         }
     }
 
-    public async Task<EmployeeDto> GetEmployeeByIdAsync(int id)
+    public async Task<IResult> GetEmployeeByIdAsync(int id)
     {
         try
         {
             var employee = await _employeeRepository.GetAsync(e => e.Id == id);
             if (employee == null)
-                throw new KeyNotFoundException("Employee not found.");
+            {
+                return Result.NotFound("Could not find any Employees with that ID:");
+            }
+            else
+            {
+                var employeedto = EmployeeFactory.ToDto(employee);
+                return Result<EmployeeDto>.OK(employeedto);
+            }    
 
-            return EmployeeFactory.ToDto(employee);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error occured when getting employee{ex.Message}");
-            throw;
+            Debug.WriteLine($"Error occured when getting employee{ex.Message}{ex.StackTrace}");
+            return Result.Error("There was an error getting Employee with ID:");
         }
     }
 
 
-    public async Task<EmployeeDto> UpdateEmployeeAsync(int id, EmployeeDto updatedEmployeeDto)
+    public async Task<IResult> UpdateEmployeeAsync(int id, EmployeeDto updatedEmployeeDto)
     {
         try
         {
+            if(updatedEmployeeDto == null)
+            {
+                return Result.BadRequest("Dto was not corecctly filed");
+            }
+            else
+            {
             var updatedEntity = EmployeeFactory.ToEntity(updatedEmployeeDto);
-
             var updatedEmployee = await _employeeRepository.UpdateAsync(e => e.Id == id, updatedEntity);
-            if (updatedEmployee == null)
-                throw new KeyNotFoundException("Employee not found for update.");
-
-            return EmployeeFactory.ToDto(updatedEmployee);
+                if (updatedEmployee == null)
+                {
+                    return Result.NotFound("Employee not found for update.");
+                }
+                else
+                {
+                var updateEmployeeDto = EmployeeFactory.ToDto(updatedEmployee);
+                return Result<EmployeeDto>.OK(updateEmployeeDto);
+                }
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error occured when updating employee{ex.Message}");
-            throw;
+            Debug.WriteLine($"Error occured when updating employee{ex.Message}{ex.StackTrace}");
+            return Result.Error("There was en error when updating employee");
         }
     }
 
-    public async Task<bool> DeleteEmployeeByIdAsync(int id)
-    {
+    public async Task<IResult> DeleteEmployeeByIdAsync(int id)
+    {      
+        try
         {
-            try
-            {
-                var exists = await _employeeRepository.DoesEntityExistAsync(e => e.Id == id);
+            var exists = await _employeeRepository.DoesEntityExistAsync(e => e.Id == id);
 
-                if (!exists)
-                {
-                    Console.WriteLine("Employee hittades inte.");
-                    return false;
-                }
-                return await _employeeRepository.DeleteAsync(e => e.Id == id);
-            }
-            catch (Exception ex)
+            if (!exists)
             {
-                Console.WriteLine($"An error occured when deleting{ex.Message}");
-                throw;
+                return Result.NotFound("Could not find the employee to Delete");
+            }
+            else
+            {
+                var deleteSuccess = await _employeeRepository.DeleteAsync(e => e.Id == id);
+                if (deleteSuccess)
+                {
+                    return Result.OK(); // Return OK if deletion was successful
+                }
+                else
+                {
+                    return Result.Error("Failed to Delete Employee by ID:");
+                }
             }
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"An error occured when deleting{ex.Message}{ex.StackTrace}");
+            return Result.Error("There was an error when deleting the Employee");
+        }       
     }
 }
 
