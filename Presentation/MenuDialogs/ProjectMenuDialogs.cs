@@ -82,7 +82,6 @@ public class ProjectMenuDialogs
         }
         else
         {
-            // Om det inte finns några projekt, eller om det är något fel
             Console.WriteLine("No projects found.");
         }
 
@@ -159,8 +158,20 @@ public class ProjectMenuDialogs
 
 
 
-            var createdProject = await _projectService.CreateProjectAsync(newProject);
-            Console.WriteLine($"Project created:");
+            var createdProjectResult = await _projectService.CreateProjectAsync(newProject);
+
+            if (createdProjectResult is Result<ProjectDto> createdProjectData)
+            {
+                // Om resultatet är framgångsrikt, hämta projektets namn
+                var createdProject = createdProjectData.Data;  // Använd createdProjectData.Data
+                Console.WriteLine($"Project created: {createdProject.Name}");
+            }
+            else
+            {
+                // Om det inte är framgångsrikt, visa felmeddelande
+                Console.WriteLine($"Error: {createdProjectResult.ErrorMessage}");
+            }
+
             Console.ReadKey();
         }
     }

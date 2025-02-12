@@ -41,7 +41,16 @@ public class ProjectService : IProjectService
             entity.Duration = projectDto.Duration; // Spara duration
 
             var result = await _projectRepository.CreateAsync(entity); // Spara projektet
-            return result ? Result.OK() : Result.Error("Unable To Create Project");
+            if (result)
+            {
+                // Skapa en ny DTO från den skapade entiteten
+                var createdProjectDto = ProjectFactory.ToDto(entity);
+                return Result<ProjectDto>.OK(createdProjectDto); // Skicka tillbaka den skapade dton så att det går att göra is data-delen
+            }
+            else
+            {
+                return Result.Error("Unable To Create Project");
+            }
         }
         catch (Exception ex)
         {

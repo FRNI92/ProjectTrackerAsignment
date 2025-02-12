@@ -47,11 +47,14 @@ serviceCollection.AddScoped<IProjectService, ProjectService>();
 serviceCollection.AddScoped<ProjectService>();
 serviceCollection.AddScoped<IEmployeeService, EmployeeService>();
 serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
+serviceCollection.AddScoped<IRoleService, RoleService>();
+serviceCollection.AddScoped<IRolesRepository, RolesRepository>();
 
 // Registrera dina meny-dialoger
 serviceCollection.AddScoped<ProjectMenuDialogs>();
 serviceCollection.AddScoped<CustomerMenuDialogs>();
 serviceCollection.AddScoped<EmployeeMenuDialogs>();
+serviceCollection.AddScoped<RoleMenuDialog>();
 serviceCollection.AddScoped<MainMenu>();  // Registrera MainMenu
 
 // Bygg service provider

@@ -23,6 +23,7 @@ public class CustomerMenuDialogs
             Console.Clear();
             Console.WriteLine("1. Show All Customer");
             Console.WriteLine("2. Create a new Customer");
+            Console.WriteLine("3. See Details And Update Customer");
             Console.WriteLine("4. Delete a Customer");
             Console.WriteLine("0. Go Back To Main Menu");
 
@@ -69,29 +70,35 @@ public class CustomerMenuDialogs
         {
             Result.Error("Error when loading customers");
         }
+        Console.ReadKey();
     }
+
 
     private async Task CreateCustomerAsync()
     {
 
         var newCustomer = new CustomerDto();
-        Console.WriteLine("put in the new Name");
-        newCustomer.Name = Console.ReadLine();
-        Console.WriteLine("put in the new Email");
-        newCustomer.Email = Console.ReadLine();
-        Console.WriteLine("put in the new Phonenumber");
-        newCustomer.PhoneNumber = Console.ReadLine();
 
+        Console.Write("Enter Customer name: ");
+        newCustomer.Name = Console.ReadLine()!;
 
-        var result = await _customerService.CreateCustomerAsync(newCustomer);
-        if (result is Result<CustomerDto> customerResult)
+        Console.Write("Enter customer email: ");
+        newCustomer.Email = Console.ReadLine()!;
+
+        Console.Write("Enter customer phonenumber: ");
+        newCustomer.PhoneNumber = Console.ReadLine()!;
+
+        var createdNewCustomer = await _customerService.CreateCustomerAsync(newCustomer);
+        if (createdNewCustomer.Success)
         {
-            Console.WriteLine($"new customer was added {customerResult.Data.Name}");
+            Console.WriteLine($"Customer created: {newCustomer.Name} {newCustomer.Email}");
         }
         else
-            {
-                Console.WriteLine("We have a problem with customer");
-            }
+        {
+            Console.WriteLine($"Error: {createdNewCustomer.ErrorMessage}");
+        }
+
+        Console.ReadKey();
     }
 
     private async Task UpdateCustomerAsync()
@@ -160,8 +167,73 @@ public class CustomerMenuDialogs
         }
     }
 
-    private  static async Task DeleteCustomerAsync()
+    private async Task DeleteCustomerAsync()
     {
+        Console.Clear();
+        Console.WriteLine("CUSTOMER-MANAGER");
+        Console.WriteLine("\tDelete Customer");
 
+        Console.WriteLine("This Is The Customer List:");
+        var customersResult = await _customerService.GetAllCustomerAsync();
+        if (customersResult is not Result<IEnumerable<CustomerDto>> customerResult || !customerResult.Success)
+        {
+            Console.WriteLine("Failed to load customers or no customers available.");
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+            return;
+        }
+
+        var customers = customerResult.Data.ToList();
+        if (!customers.Any())
+        {
+            Console.WriteLine("No customers found.");
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+            return;
+        }
+
+        // Visa alla kunder
+        int index = 1;
+        foreach (var customer in customers)
+        {
+            Console.WriteLine($"{index}. Name: {customer.Name}, Email: {customer.Email}");
+            index++;
+        }
+
+        Console.WriteLine("----Which Customer Would You Like To Delete?");
+        if (!int.TryParse(Console.ReadLine(), out int choice) || choice <= 0 || choice > customers.Count())
+        {
+            Console.WriteLine("Invalid choice.");
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+            return;
+        }
+
+        var selectedCustomer = customers.ElementAt(choice - 1);
+
+        // Be om bekräftelse innan radering
+        Console.WriteLine($"Are you sure you want to delete this customer: {selectedCustomer.Name}? (y/n)");
+        if (Console.ReadLine()?.ToLower() != "y")
+        {
+            Console.WriteLine("Customer deletion cancelled.");
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+            return;
+        }
+
+        // Försök att radera kunden
+        try
+        {
+            await _customerService.DeleteCustomerAsync(selectedCustomer);
+            Console.WriteLine("Customer deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to delete the customer. Error: {ex.Message}");
+        }
+
+        Console.WriteLine("\nPress any key to return to the menu...");
+        Console.ReadKey();
     }
 }
+
