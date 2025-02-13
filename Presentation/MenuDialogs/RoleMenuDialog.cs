@@ -60,8 +60,8 @@ public class RoleMenuDialog
                 var rolesData = roleResult.Data;
                 foreach (var role in rolesData)
                 {
-                    Console.WriteLine($"Customer Name: {role.Name} ");
-                    Console.WriteLine($"Customer Name: {role.Description} ");
+                    
+                    Console.WriteLine($" Name: {role.Name}, Role Description: {role.Description}");
                 }
             }
             else

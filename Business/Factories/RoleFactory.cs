@@ -14,6 +14,7 @@ public static class RoleFactory
     {
         return new RolesEntity
         {
+            Id = rolesDto.Id,
             Name = rolesDto.Name,
             Description = rolesDto.Description,
         };
@@ -23,6 +24,7 @@ public static class RoleFactory
     {
         return new RolesDto
         {
+            Id = rolesEntity.Id,
             Name = rolesEntity.Name,
             Description = rolesEntity.Description,
         };
