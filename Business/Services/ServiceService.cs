@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Business.Services;
 
-public class ServiceService
+public class ServiceService : IServiceService
 {
     private readonly IServiceRepository _serviceRepository;
 
@@ -59,7 +59,7 @@ public class ServiceService
             if (!serviceList.Any())
 
                 return Result.NotFound("could not find any services");
-            
+
 
             var convertedList = serviceList.Select(ServiceFactory.ToDto).ToList();
             return Result<IEnumerable<ServiceDto>>.OK(convertedList);
@@ -115,7 +115,7 @@ public class ServiceService
         }
     }
 
-    public async Task <IResult> DeleteServiceEntity(int id)
+    public async Task<IResult> DeleteServiceEntity(int id)
     {
         await _serviceRepository.BeginTransactionAsync();
         try
@@ -129,7 +129,7 @@ public class ServiceService
             }
 
             var serviceResult = await _serviceRepository.RemoveAsync(s => s.Id == id);
-            if(!serviceResult)
+            if (!serviceResult)
             {
                 await _serviceRepository.RollBackTransactionAsync();
                 return Result.Error("There was an error when removing service ");

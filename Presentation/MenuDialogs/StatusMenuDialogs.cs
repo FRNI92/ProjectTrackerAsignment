@@ -2,19 +2,20 @@
 using Business.Interfaces;
 using Business.Models;
 using Business.Services;
+using Presentation.Interfaces;
 
 namespace Presentation.MenuDialogs;
 
-public class StatusMenuDiallogs
+public class StatusMenuDialogs : IStatusMenuDialogs
 {
     private readonly StatusService _statusservice;
 
-    public StatusMenuDiallogs(StatusService statusservice)
+    public StatusMenuDialogs(StatusService statusservice)
     {
         _statusservice = statusservice;
     }
 
-public async Task ShowStatusMenu()
+    public async Task ShowStatusMenu()
     {
         while (true)
         {
@@ -54,7 +55,7 @@ public async Task ShowStatusMenu()
 
     private async Task ShowStatusAsync()
     {
-    var statuses = await _statusservice.ReadStatusAsync();
+        var statuses = await _statusservice.ReadStatusAsync();
         if (statuses is Result<IEnumerable<StatusDto>> statusResult)
         {
             var statusesData = statusResult.Data;
@@ -96,8 +97,8 @@ public async Task ShowStatusMenu()
         Console.Clear();
         Console.WriteLine("This Is The Status-List:");
 
-    // Hämta alla kunder
-    var statuses = await _statusservice.ReadStatusAsync();
+        // Hämta alla kunder
+        var statuses = await _statusservice.ReadStatusAsync();
 
         if (statuses is Result<IEnumerable<StatusDto>> statusesResult && statusesResult.Success)
         {
@@ -133,7 +134,7 @@ public async Task ShowStatusMenu()
                 {
                     Id = selectedStatus.Id,
                     Name = string.IsNullOrWhiteSpace(newStatusName) ? selectedStatus.Name : newStatusName//tom eller null behåll gamla : annar newName
-                        
+
                 };
                 var result = await _statusservice.UpdateStatusAsync(updatedStatus);
                 if (result.Success)  // Kontrollera om resultatet var framgångsrikt
@@ -145,10 +146,10 @@ public async Task ShowStatusMenu()
                     Console.WriteLine($"Failed to update the Status: {result.ErrorMessage}");
                 }
             }
-        Console.ReadKey();
+            Console.ReadKey();
         }
     }
-    
+
     private async Task DeleteStatusAsync()
     {
         Console.Clear();
@@ -204,7 +205,7 @@ public async Task ShowStatusMenu()
 
         try
         {
-        await _statusservice.DeleteStatusAsync(selectedStatus.Id);
+            await _statusservice.DeleteStatusAsync(selectedStatus.Id);
             Console.WriteLine("Status deleted successfully.");
         }
         catch (Exception ex)

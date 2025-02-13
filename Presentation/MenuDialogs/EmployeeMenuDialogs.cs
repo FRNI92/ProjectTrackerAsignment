@@ -3,11 +3,12 @@ using Business.Interfaces;
 using Business.Models;
 using Business.Services;
 using Data.Interfaces;
+using Presentation.Interfaces;
 using System.Diagnostics.Eventing.Reader;
 
 namespace Presentation.MenuDialogs;
 
-public class EmployeeMenuDialogs
+public class EmployeeMenuDialogs : IEmployeeMenuDialogs
 {
     private readonly IEmployeeService _employeeService;
 
@@ -79,7 +80,7 @@ public class EmployeeMenuDialogs
     private async Task CreateEmployeeAsync()
     {
 
-        var newEmployee= new EmployeeDto();
+        var newEmployee = new EmployeeDto();
 
         Console.Write("Enter Employee first name: ");
         newEmployee.FirstName = Console.ReadLine()!;
@@ -97,7 +98,7 @@ public class EmployeeMenuDialogs
         {
             Console.Write("Invalid input. Please enter a valid Role ID: ");
         }
-        
+
         newEmployee.RoleId = roleId;
 
         var createdEmployee = await _employeeService.CreateEmployeeAsync(newEmployee);
@@ -157,15 +158,15 @@ public class EmployeeMenuDialogs
                 Console.Write($"Enter new Email (leave blank to keep current:({selectedEmployee.Email}): ");
                 var newEmail = Console.ReadLine();
                 Console.Write($"Enter new Role (leave blank to keep current:({selectedEmployee.RoleId}): ");
-                var newRoleId= Console.ReadLine();
+                var newRoleId = Console.ReadLine();
 
                 var updatedEmployee = new EmployeeDto
                 {
                     Id = selectedEmployee.Id, // Skicka ID:t istället för att söka med namn
                     FirstName = string.IsNullOrWhiteSpace(newFirstName) ? selectedEmployee.FirstName : newFirstName,//tom eller null behåll gamla : annar newName
-                    LastName = string.IsNullOrWhiteSpace(newLastName) ? selectedEmployee.LastName: newLastName,
-                    Email = string.IsNullOrWhiteSpace(newEmail) ? selectedEmployee.Email: (newEmail),
-                    RoleId = string.IsNullOrWhiteSpace(newRoleId) ? selectedEmployee.RoleId: int.Parse(newRoleId)
+                    LastName = string.IsNullOrWhiteSpace(newLastName) ? selectedEmployee.LastName : newLastName,
+                    Email = string.IsNullOrWhiteSpace(newEmail) ? selectedEmployee.Email : (newEmail),
+                    RoleId = string.IsNullOrWhiteSpace(newRoleId) ? selectedEmployee.RoleId : int.Parse(newRoleId)
                 };
 
                 await _employeeService.UpdateEmployeeAsync(updatedEmployee.Id, updatedEmployee);
@@ -176,7 +177,7 @@ public class EmployeeMenuDialogs
         }
     }
 
-    public async Task DeleteEmployeeAsync()
+    private async Task DeleteEmployeeAsync()
     {
         Console.Clear();
         Console.WriteLine("\tEMPLOYEE-MANAGER");

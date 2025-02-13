@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Business.Services;
 
-public class StatusService(IStatusRepository statusRepository)
+public class StatusService(IStatusRepository statusRepository) : IStatusService
 {
     private readonly IStatusRepository _statusRepository = statusRepository;
 
@@ -72,7 +72,7 @@ public class StatusService(IStatusRepository statusRepository)
         }
     }
 
-    public async Task <IResult> UpdateStatusAsync(StatusDto statusDto) 
+    public async Task<IResult> UpdateStatusAsync(StatusDto statusDto)
     {
         if (statusDto == null)
         {
@@ -148,5 +148,5 @@ public class StatusService(IStatusRepository statusRepository)
             Debug.WriteLine($"An error occurred when deleting status: {ex.Message}{ex.StackTrace}");
             return Result.Error("something went wrong when deleting the status");
         }
-    }    
+    }
 }

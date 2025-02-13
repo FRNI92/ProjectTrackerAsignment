@@ -82,29 +82,6 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     }
 
 
-    public virtual async Task<bool> CreateAsync(TEntity entity)
-    {
-        try
-        {
-            Console.WriteLine("Creating Something");
-            if (entity == null)
-            {
-                return false;
-            }
-            else
-            {
-                await _dbSet.AddAsync(entity);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.Write($"Error In CreateAsync:{ex.Message}");
-            return false;
-        }
-    }
-
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
         try
@@ -165,28 +142,6 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     //transactionManagement
 
 
-    public virtual async Task<TEntity> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
-    {
-
-        try
-        {
-            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
-            if (existingEntity != null && updatedEntity != null)
-            {
-                _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
-                //await _context.SaveChangesAsync();//tog bort savechangesasyn härifrån för att den är utbruten
-                return existingEntity;
-            }
-            return null!;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in UpdateAsync:{ex.Message}");
-            return null!;
-        }
-
-    }
-
     //transactionManagement
     public virtual async Task<bool> RemoveAsync(Expression<Func<TEntity, bool>> expression)
     {
@@ -207,26 +162,6 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         }
     }
     //transactionManagement
-
-    public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> expression)
-    {
-        try
-        {
-            var entity = await _dbSet.FirstOrDefaultAsync(expression);
-            if (entity != null)
-            {
-                _context.Remove(entity);
-                await _context.SaveChangesAsync();//den här är utbruten, ändra anropsvägen
-                return true;
-            }
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error With DeleteAsync{ex.Message}");
-            return false;
-        }
-    }
 
     public virtual async Task<bool> DoesEntityExistAsync(Expression<Func<TEntity, bool>> expression)
     {

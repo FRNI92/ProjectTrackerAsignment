@@ -1,10 +1,11 @@
 ﻿using Business.Dtos;
 using Business.Models;
 using Business.Services;
+using Presentation.Interfaces;
 
 namespace Presentation.MenuDialogs;
 
-public class ServiceMenuDialogs
+public class ServiceMenuDialogs : IServiceMenuDialogs
 {
     private readonly ServiceService _serviceService;
 

@@ -4,10 +4,11 @@ using Business.Models;
 using Business.Services;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.Interfaces;
 
 namespace Presentation.MenuDialogs;
 
-public class CustomerMenuDialogs
+public class CustomerMenuDialogs : ICustomerMenuDialogs
 {
     private readonly ICustomerService _customerService;
 

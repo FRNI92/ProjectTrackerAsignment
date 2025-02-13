@@ -2,10 +2,11 @@
 using Business.Interfaces;
 using Business.Models;
 using Business.Services;
+using Presentation.Interfaces;
 
 namespace Presentation.MenuDialogs;
 
-public class ProjectMenuDialogs
+public class ProjectMenuDialogs : IProjectMenuDialogs
 {
     private readonly IProjectService _projectService;
     private readonly IEmployeeService _employeeService;
@@ -173,7 +174,7 @@ public class ProjectMenuDialogs
             }
         }
     }
-    
+
 
     private async Task UpdateProjectAsync()
     {
@@ -208,7 +209,7 @@ public class ProjectMenuDialogs
                 Console.WriteLine($"The Service Duration is set to: {project.Duration} Hours");
                 Console.WriteLine($"The Service Total Price Is: {project.TotalPrice} SEK");
 
-                Console.WriteLine("------------------------------------");  
+                Console.WriteLine("------------------------------------");
                 index++;
             }
 
@@ -280,7 +281,7 @@ public class ProjectMenuDialogs
     //Service-lagret hämtar kunden via repositoryt och kontrollerar att den existerar.
     //Om kunden finns, skickas entiteten vidare till repositoryt.
     //Repositoryt markerar entiteten som ska tas bort och sparar ändringen i databasen.
-    public async Task DeleteProjectAsync()
+    private async Task DeleteProjectAsync()
     {
         Console.Clear();
         Console.WriteLine("\tCUSTOMER-MANAGER");

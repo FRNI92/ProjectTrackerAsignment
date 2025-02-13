@@ -1,14 +1,16 @@
-﻿namespace Presentation.MenuDialogs;
+﻿using Presentation.Interfaces;
 
-public class MainMenu
+namespace Presentation.MenuDialogs;
+
+public class MainMenu : IMainMenu
 {
     private readonly ProjectMenuDialogs _projectMenuDialogs;
     private readonly CustomerMenuDialogs _customerMenuDialogs;
     private readonly EmployeeMenuDialogs _employeeMenuDialogs;
     private readonly RoleMenuDialog _roleMenuDialog;
-    private readonly StatusMenuDiallogs _statusMenuDiallogs;
+    private readonly StatusMenuDialogs _statusMenuDiallogs;
     private readonly ServiceMenuDialogs _serviceMenuDialogs;
-    public MainMenu(ProjectMenuDialogs projectMenuDialogs, CustomerMenuDialogs customerMenuDialogs, EmployeeMenuDialogs employeeMenuDialogs, RoleMenuDialog roleMenuDialog, StatusMenuDiallogs statusMenuDiallogs, ServiceMenuDialogs serviceMenuDialogs)
+    public MainMenu(ProjectMenuDialogs projectMenuDialogs, CustomerMenuDialogs customerMenuDialogs, EmployeeMenuDialogs employeeMenuDialogs, RoleMenuDialog roleMenuDialog, StatusMenuDialogs statusMenuDiallogs, ServiceMenuDialogs serviceMenuDialogs)
     {
         _projectMenuDialogs = projectMenuDialogs;
         _customerMenuDialogs = customerMenuDialogs;
@@ -61,8 +63,8 @@ public class MainMenu
                     await _serviceMenuDialogs.ShowServicesMenu();
                     break;
                 case "0":
-                        return;
-                    default:
+                    return;
+                default:
                     Console.WriteLine("Invalid option. Try again.");
                     break;
             }

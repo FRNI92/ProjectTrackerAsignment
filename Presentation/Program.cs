@@ -59,7 +59,7 @@ serviceCollection.AddScoped<ProjectMenuDialogs>();
 serviceCollection.AddScoped<CustomerMenuDialogs>();
 serviceCollection.AddScoped<EmployeeMenuDialogs>();
 serviceCollection.AddScoped<RoleMenuDialog>();
-serviceCollection.AddScoped<StatusMenuDiallogs>();
+serviceCollection.AddScoped<StatusMenuDialogs>();
 serviceCollection.AddScoped<ServiceMenuDialogs>();
 serviceCollection.AddScoped<MainMenu>();  // Registrera MainMenu
 
