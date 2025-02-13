@@ -15,6 +15,8 @@ namespace Data.Interfaces
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression);
 
+        Task<bool> RemoveAsync(Expression<Func<TEntity, bool>> expression);
+        Task<TEntity> TransactionUpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity);
         Task<TEntity> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity);
         //task:gör detta. <TEntity>: få tillbaka den här typen. MetodNamn. "tål" bara en enda object av typen TEntity
         Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> expression);

@@ -171,8 +171,6 @@ public class ProjectMenuDialogs
                 // Om det inte är framgångsrikt, visa felmeddelande
                 Console.WriteLine($"Error: {createdProjectResult.ErrorMessage}");
             }
-
-            Console.ReadKey();
         }
     }
     
@@ -210,7 +208,7 @@ public class ProjectMenuDialogs
                 Console.WriteLine($"The Service Duration is set to: {project.Duration} Hours");
                 Console.WriteLine($"The Service Total Price Is: {project.TotalPrice} SEK");
 
-                Console.WriteLine("------------------------------------");
+                Console.WriteLine("------------------------------------");  
                 index++;
             }
 
@@ -272,6 +270,8 @@ public class ProjectMenuDialogs
                 Console.ReadKey();
             }
         }
+        Console.WriteLine("\nPress any key to return to the menu...");
+        Console.ReadKey();
     }
 
 

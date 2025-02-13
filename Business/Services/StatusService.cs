@@ -74,36 +74,43 @@ public class StatusService(IStatusRepository statusRepository)
 
     public async Task <IResult> UpdateStatusAsync(StatusDto statusDto) 
     {
+        if (statusDto == null)
+        {
+            return Result.BadRequest("statusdto cant be null");
+        }
+
+        await _statusRepository.BeginTransactionAsync();
         try
         {
-            if (statusDto == null)
-            {
-                return Result.BadRequest("statusdto cant be null");
-            }
-
             // Hämta den befintliga entiteten från databasen
             var existingEntity = await _statusRepository.GetAsync(s => s.Id == statusDto.Id);
             if (existingEntity == null)
             {
-                Console.WriteLine("Status not found.");
+                await _statusRepository.RollBackTransactionAsync();
                 return Result.NotFound("Could not find the status");
             }
             else
             {
-            StatusFactory.UpdatedEntity(existingEntity, statusDto);
+                StatusFactory.UpdatedEntity(existingEntity, statusDto);
+                var updatedStatus = await _statusRepository.TransactionUpdateAsync(s => s.Id == statusDto.Id, existingEntity);
 
-            
-             var updatedStatus = await _statusRepository.UpdateAsync(s => s.Id == statusDto.Id, existingEntity);
                 if (updatedStatus != null)
                 {
-                    return Result<StatusDto>.OK(StatusFactory.ToDto(updatedStatus));
+                    var saveResult = await _statusRepository.SaveAsync(); // Save changes
+                    if (saveResult > 0)
+                    {
+                        await _statusRepository.CommitTransactionAsync();
+                        return Result<StatusDto>.OK(StatusFactory.ToDto(updatedStatus));
+                    }
                 }
-                return Result.NotFound("Could not find status to update");
+                await _statusRepository.RollBackTransactionAsync();
+                return Result.Error("Could not update status");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred while updating the status: {ex.Message}{ex.StackTrace}");
+            await _statusRepository.RollBackTransactionAsync();
+            Debug.WriteLine($"An error occurred while updating the status: {ex.Message}{ex.StackTrace}");
             return Result.Error("There was an error when updating status");
         }
     }
@@ -111,24 +118,34 @@ public class StatusService(IStatusRepository statusRepository)
 
     public async Task<IResult> DeleteStatusAsync(int id)
     {
+        await _statusRepository.BeginTransactionAsync();
         try
         {
-            // Kontrollera om statusen finns
             var exists = await _statusRepository.DoesEntityExistAsync(s => s.Id == id);
             if (!exists)
             {
+                await _statusRepository.RollBackTransactionAsync();
                 return Result.NotFound("Could not find the status");
             }
 
-            var wasDeleted = await _statusRepository.DeleteAsync(s => s.Id == id);
+            var wasDeleted = await _statusRepository.RemoveAsync(s => s.Id == id);
             if (wasDeleted)
-                return Result.OK();
+            {
+                var saveResult = await _statusRepository.SaveAsync();
+                if (saveResult > 0)
+                {
+                    await _statusRepository.CommitTransactionAsync();
+                    return Result.OK();
+                }
+            }
 
-            return Result.BadRequest("was not able to delete status");
+            await _statusRepository.RollBackTransactionAsync();
+            return Result.BadRequest("Was not able to delete status");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred when deleting status: {ex.Message}{ex.StackTrace}");
+            await _statusRepository.RollBackTransactionAsync();
+            Debug.WriteLine($"An error occurred when deleting status: {ex.Message}{ex.StackTrace}");
             return Result.Error("something went wrong when deleting the status");
         }
     }    

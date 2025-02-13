@@ -18,28 +18,44 @@ public class EmployeeService : IEmployeeService
     }
     public async Task<IResult> CreateEmployeeAsync(EmployeeDto employeeDto)
     {
+        if (employeeDto == null)
+        {
+           return Result.BadRequest("Employee Dto was not filled in correcly");
+        }
+
+        await _employeeRepository.BeginTransactionAsync();
+        
         try
         {
-            if (employeeDto == null)
-            {
-                Result.BadRequest("Employee Dto was not filled in correcly");
-            }
-
             bool exists = await _employeeRepository.DoesEntityExistAsync(e => e.Email == employeeDto.Email);
             if (exists)
             {
+                await _employeeRepository.RollBackTransactionAsync();
                 return Result.AlreadyExists("An employee with this email already exists.");
             }
-            else
+
+            var newEmployeeEntity = EmployeeFactory.ToEntity(employeeDto);
+            var CreatedEmployee = await _employeeRepository.AddAsync(newEmployeeEntity);
+            if (CreatedEmployee == false)
             {
-                var newEmployeeEntity = EmployeeFactory.ToEntity(employeeDto);
-                var CreatedEmployee = await _employeeRepository.CreateAsync(newEmployeeEntity);
+                await _employeeRepository.RollBackTransactionAsync();
+                return Result.BadRequest("Could not save the employee");
+            }
+
+            var isSaved = await _employeeRepository.SaveAsync();
+            if (isSaved > 0)
+            {
+                await _employeeRepository.CommitTransactionAsync();
                 return Result.OK();
             }
+
+            await _employeeRepository.RollBackTransactionAsync();
+            return Result.BadRequest("Could not save the employee");
         }
 
         catch (Exception ex)
         {
+            await _employeeRepository.RollBackTransactionAsync();
             Debug.WriteLine($"Error With CreateEmployeeAsync{ex.Message}{ex.StackTrace}");
             return Result.Error("Something went wrong when creating Employee");
         }
@@ -94,26 +110,43 @@ public class EmployeeService : IEmployeeService
 
     public async Task<IResult> UpdateEmployeeAsync(int id, EmployeeDto updatedEmployeeDto)
     {
+        if (updatedEmployeeDto == null)
+        {
+            return Result.BadRequest("Dto was not corecctly filed");
+        }
+
+        await _employeeRepository.BeginTransactionAsync();
         try
         {
-            if(updatedEmployeeDto == null)
+            var existingEmployee = await _employeeRepository.GetAsync(e => e.Id == id);
+            if (existingEmployee == null)
             {
-                return Result.BadRequest("Dto was not corecctly filed");
+                await _employeeRepository.RollBackTransactionAsync();
+                return Result.NotFound("Employee not found for update.");
             }
-            else
-            {
+
+            // Skapa en ny entitet från DTO och ersätt den gamla
             var updatedEntity = EmployeeFactory.ToEntity(updatedEmployeeDto);
-            var updatedEmployee = await _employeeRepository.UpdateAsync(e => e.Id == id, updatedEntity);
-                if (updatedEmployee == null)
-                {
-                    return Result.NotFound("Employee not found for update.");
-                }
-                else
-                {
+
+            // Uppdatera direkt i databasen
+            var updatedEmployee = await _employeeRepository.TransactionUpdateAsync(e => e.Id == id, updatedEntity);
+            if (updatedEmployee == null)
+            {
+                await _employeeRepository.RollBackTransactionAsync();
+                return Result.Error("Failed to update employee.");
+            }
+
+            // Spara ändringarna
+            var isUpdatedAndSaved = await _employeeRepository.SaveAsync();
+            if (isUpdatedAndSaved > 0)
+            {
+                await _employeeRepository.CommitTransactionAsync();
                 var updateEmployeeDto = EmployeeFactory.ToDto(updatedEmployee);
                 return Result<EmployeeDto>.OK(updateEmployeeDto);
-                }
             }
+
+            await _employeeRepository.RollBackTransactionAsync();
+            return Result.Error("Update failed, no changes were saved.");
         }
         catch (Exception ex)
         {
@@ -123,30 +156,37 @@ public class EmployeeService : IEmployeeService
     }
 
     public async Task<IResult> DeleteEmployeeByIdAsync(int id)
-    {      
+    {
+
+        await _employeeRepository.BeginTransactionAsync();
         try
         {
-            var exists = await _employeeRepository.DoesEntityExistAsync(e => e.Id == id);
+            if (!await _employeeRepository.DoesEntityExistAsync(e => e.Id == id))
+            {
+                await _employeeRepository.RollBackTransactionAsync();
+                return Result.NotFound("Could not find the employee to delete.");
+            }
 
-            if (!exists)
+            var deleteSuccess = await _employeeRepository.RemoveAsync(e => e.Id == id);
+            if (!deleteSuccess)
             {
-                return Result.NotFound("Could not find the employee to Delete");
+                await _employeeRepository.RollBackTransactionAsync();
+                return Result.Error("Failed to delete employee.");
             }
-            else
+
+            var isSaved = await _employeeRepository.SaveAsync();
+            if (isSaved > 0)
             {
-                var deleteSuccess = await _employeeRepository.DeleteAsync(e => e.Id == id);
-                if (deleteSuccess)
-                {
-                    return Result.OK(); // Return OK if deletion was successful
-                }
-                else
-                {
-                    return Result.Error("Failed to Delete Employee by ID:");
-                }
+                await _employeeRepository.CommitTransactionAsync();
+                return Result.OK();
             }
+
+            await _employeeRepository.RollBackTransactionAsync();
+            return Result.Error("Could not save deletion.");
         }
         catch (Exception ex)
         {
+            await _employeeRepository.RollBackTransactionAsync();
             Debug.WriteLine($"An error occured when deleting{ex.Message}{ex.StackTrace}");
             return Result.Error("There was an error when deleting the Employee");
         }       

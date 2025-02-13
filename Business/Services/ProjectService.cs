@@ -26,11 +26,14 @@ public class ProjectService : IProjectService
     {
         if (projectDto == null)
             return Result.BadRequest("Invalid project Data transfer object");
+
+        await _projectRepository.BeginTransactionAsync();
         try
         {
             var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
             if (selectedService == null)
             {
+                await _projectRepository.RollBackTransactionAsync();
                 return Result.NotFound("Could not find a service with that service ID");
             }
             // Beräkna totalpris baserat på tjänstens pris och användarens valda duration
@@ -40,22 +43,29 @@ public class ProjectService : IProjectService
             entity.TotalPrice = totalPrice; // Spara totalpriset i entiteten
             entity.Duration = projectDto.Duration; // Spara duration
 
-            var result = await _projectRepository.CreateAsync(entity); // Spara projektet
-            if (result)
+            var result = await _projectRepository.AddAsync(entity); // Spara projektet
+            if (!result)
             {
-                // Skapa en ny DTO från den skapade entiteten
-                var createdProjectDto = ProjectFactory.ToDto(entity);
-                return Result<ProjectDto>.OK(createdProjectDto); // Skicka tillbaka den skapade dton så att det går att göra is data-delen
-            }
-            else
-            {
+                await _projectRepository.RollBackTransactionAsync();
                 return Result.Error("Unable To Create Project");
             }
+
+            var saveResult = await _projectRepository.SaveAsync();
+            if (saveResult > 0)
+            {
+                await _projectRepository.CommitTransactionAsync();
+                var createdProjectDto = ProjectFactory.ToDto(entity);
+                return Result<ProjectDto>.OK(createdProjectDto);
+            }
+
+            await _projectRepository.RollBackTransactionAsync();
+            return Result.Error("Failed to create project, no changes were saved.");
         }
         catch (Exception ex)
         {
+            await _projectRepository.RollBackTransactionAsync();
             Debug.WriteLine(ex.Message);
-            return Result.Error(ex.Message);
+            return Result.Error("Something went wrong when creating project");
         }
     }
 
@@ -84,12 +94,15 @@ public class ProjectService : IProjectService
 
     public async Task<IResult> UpdateProjectAsync(ProjectDto projectDto)
     {
+
+        await _projectRepository.BeginTransactionAsync();
         try
         {
             //Hämta projektet
             var fetcheduneditedProject = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
             if (fetcheduneditedProject == null)
             {
+                await _projectRepository.RollBackTransactionAsync();
                 return Result.Error("An error occurred while loading the project.");
             }
 
@@ -99,6 +112,7 @@ public class ProjectService : IProjectService
                 var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
                 if (selectedService == null)
                 {
+                    await _projectRepository.RollBackTransactionAsync();
                     return Result.NotFound("cant find service with that ID");
                 }
 
@@ -129,18 +143,28 @@ public class ProjectService : IProjectService
             fetcheduneditedProject.Duration = projectDto.Duration != 0 ? projectDto.Duration : fetcheduneditedProject.Duration;
             fetcheduneditedProject.EmployeeId = projectDto.EmployeeId != 0 ? projectDto.EmployeeId : fetcheduneditedProject.EmployeeId;
             // Skicka med både lambda-uttryck och den uppdaterade entiteten
-            var updatedProject = await _projectRepository.UpdateAsync(p => p.Id == projectDto.Id, fetcheduneditedProject);
+            var updatedProject = await _projectRepository.TransactionUpdateAsync(p => p.Id == projectDto.Id, fetcheduneditedProject);
 
             if (updatedProject == null)
             {
+                await _projectRepository.RollBackTransactionAsync();
                 return Result.Error("Unable to update project.");
             }
-            //Omvandla den uppdaterade entiteten till DTO och returnera som resultat
-            var updatedProjectDto = ProjectFactory.ToDto(updatedProject);
-            return Result<ProjectDto>.OK(updatedProjectDto);
+
+            var saveResult = await _projectRepository.SaveAsync();
+            if (saveResult > 0)
+            {
+                await _projectRepository.CommitTransactionAsync();
+                var updatedProjectDto = ProjectFactory.ToDto(updatedProject);
+                return Result<ProjectDto>.OK(updatedProjectDto);
+            }
+
+            await _projectRepository.RollBackTransactionAsync();
+            return Result.Error("Update failed, no changes were savd.");
         }
         catch (Exception ex)
         {
+            await _projectRepository.RollBackTransactionAsync();
             Debug.WriteLine($"Problem when updating project {ex.Message} {ex.StackTrace}");
             return Result.Error("Problem when updating project");
         }
@@ -148,20 +172,35 @@ public class ProjectService : IProjectService
   
     public async Task<IResult> DeleteProjectAsync(ProjectDto projectDto) 
     {
+        await _projectRepository.BeginTransactionAsync();
         try
         {
             var project = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
             if (project == null)
             {
+                await _projectRepository.RollBackTransactionAsync();
                 return Result.Error("Project could not be found");
             }
 
-            await _projectRepository.DeleteAsync(p => p.Id == projectDto.Id);
-            Debug.WriteLine($"Project {projectDto.Id} deleted successfully.");
-            return Result.OK();
+            var isRemoved = await _projectRepository.RemoveAsync(p => p.Id == projectDto.Id);
+            if (!isRemoved)
+            {
+                await _projectRepository.RollBackTransactionAsync();
+                return Result.Error("Failed to remove project.");
+            }
+            var isRemovedAndSaved = await _projectRepository.SaveAsync();
+            if (isRemovedAndSaved > 0)
+            {
+                await _projectRepository.CommitTransactionAsync();
+                return Result.OK();
+            }
+
+            await _projectRepository.RollBackTransactionAsync();
+            return Result.Error("Deletion failed, no changes were saved.");
         }
         catch (Exception ex)
         {
+            await _projectRepository.RollBackTransactionAsync();
             Debug.WriteLine($"Could not Delete project{ex.Message} {ex.StackTrace}");
             return Result.Error("Could not delete project");
         }

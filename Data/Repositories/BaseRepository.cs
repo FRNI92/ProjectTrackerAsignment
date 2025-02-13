@@ -109,11 +109,11 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     {
         try
         {
-            var allProject = await _dbSet.ToListAsync();
-            if (allProject == null)
+            var allEntities = await _dbSet.ToListAsync();
+            if (allEntities == null)
                 return null!;
             Debug.WriteLine("BaseRepository: Fetching all entities In...");
-            return allProject;
+            return allEntities;
         }
         catch (Exception ex)
         {
@@ -141,7 +141,8 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         }
     }
 
-    public virtual async Task<TEntity> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
+    //transactionManagement
+    public virtual async Task<TEntity> TransactionUpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
     {
 
         try
@@ -149,8 +150,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
             var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
             if (existingEntity != null && updatedEntity != null)
             {
-                _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
-                await _context.SaveChangesAsync();
+                _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);               
                 return existingEntity;
             }
             return null!;
@@ -162,6 +162,52 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         }
 
     }
+    //transactionManagement
+
+
+    public virtual async Task<TEntity> UpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
+    {
+
+        try
+        {
+            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
+            if (existingEntity != null && updatedEntity != null)
+            {
+                _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
+                //await _context.SaveChangesAsync();//tog bort savechangesasyn härifrån för att den är utbruten
+                return existingEntity;
+            }
+            return null!;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in UpdateAsync:{ex.Message}");
+            return null!;
+        }
+
+    }
+
+    //transactionManagement
+    public virtual async Task<bool> RemoveAsync(Expression<Func<TEntity, bool>> expression)
+    {
+        try
+        {
+            var entity = await _dbSet.FirstOrDefaultAsync(expression);
+            if (entity != null)
+            {
+                _context.Remove(entity);
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error With DeleteAsync{ex.Message}");
+            return false;
+        }
+    }
+    //transactionManagement
+
     public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> expression)
     {
         try
@@ -170,7 +216,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
             if (entity != null)
             {
                 _context.Remove(entity);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();//den här är utbruten, ändra anropsvägen
                 return true;
             }
             return false;
