@@ -44,6 +44,43 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
 
 
 
+    public virtual async Task<bool> AddAsync(TEntity entity)
+    {
+        try
+        {
+            Console.WriteLine("Adding Something");
+            if (entity == null)
+            {
+                return false;
+            }
+            else
+            {
+                await _dbSet.AddAsync(entity);
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Write($"Error In AddAsync:{ex.Message}");
+            return false;
+        }
+    }
+
+
+    public virtual async Task<int> SaveAsync()
+    {
+        try
+        {
+            Console.WriteLine("Saving Something");
+            return await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.Write($"Error In SaveAsync: {ex.Message}");
+            return 0; // Returnera 0 vid fel istället för false, typ som en bool
+        }
+    }
+
 
     public virtual async Task<bool> CreateAsync(TEntity entity)
     {

@@ -17,28 +17,35 @@ public class StatusService(IStatusRepository statusRepository)
     //CREATE
     public async Task<IResult> CreateStatusAsync(StatusDto statusDto)
     {
+        if (statusDto == null)
+            return Result.BadRequest("Status DTO was not filled in correctly");
+
+        var isExisting = await _statusRepository.DoesEntityExistAsync(s => s.Name == statusDto.Name);
+        if (isExisting)
+            return Result.AlreadyExists("A status with that name already exists.");
+
+        await _statusRepository.BeginTransactionAsync();
         try
         {
-            if (statusDto == null)
-                return Result.Error("status dto was not filled in correctly");
+            var newStatusEntity = StatusFactory.ToEntity(statusDto);
+            await _statusRepository.AddAsync(newStatusEntity); // Lägg till, men spara inte än
 
-            var isExisting = await _statusRepository.DoesEntityExistAsync(s => s.Name == statusDto.Name);
-            if (isExisting)
+            var saveResult = await _statusRepository.SaveAsync(); // Spara ändringarna
+            if (saveResult > 0)
             {
-                return Result.AlreadyExists("A status with that name already exists.");
+                await _statusRepository.CommitTransactionAsync();
+                return Result.OK();
             }
 
-            var newStatusEntity = StatusFactory.ToEntity(statusDto);
-            var createdStatusEntity = await _statusRepository.CreateAsync(newStatusEntity);
-            if (createdStatusEntity)
-                return Result.OK();
+            // Om SaveAsync misslyckas, rulla tillbaka
+            await _statusRepository.RollBackTransactionAsync();
             return Result.Error("Could not create status correctly");
-            
         }
         catch (Exception ex)
         {
+            await _statusRepository.RollBackTransactionAsync();
             Debug.WriteLine($"An error occurred when creating status: {ex.Message}{ex.StackTrace}");
-            return Result.Error("There was a problem with server");
+            return Result.Error("There was a problem with the server");
         }
     }
 
