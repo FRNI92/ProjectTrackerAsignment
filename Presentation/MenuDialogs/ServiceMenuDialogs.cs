@@ -56,7 +56,7 @@ public class ServiceMenuDialogs
     private async Task ShowServiceAsync()
     {
         var services = await _serviceService.ReadServiceAsync();
-        if (services is Result<IEnumerable<StatusDto>> servicesResult)
+        if (services is Result<IEnumerable<ServiceDto>> servicesResult)
         {
             var servicesData = servicesResult.Data;
             foreach (var service in servicesData)
@@ -150,23 +150,23 @@ public class ServiceMenuDialogs
     private async Task DeleteServiceAsync()
     {
         Console.Clear();
-        Console.WriteLine("Statuses-MANAGER");
-        Console.WriteLine("\tDelete Status");
+        Console.WriteLine("Service-MANAGER");
+        Console.WriteLine("\tDelete Service");
 
-        Console.WriteLine("This Is The Status-List:");
-        var statusesResult = await _statusservice.ReadStatusAsync();
-        if (statusesResult is not Result<IEnumerable<StatusDto>> statusResult || !statusResult.Success)
+        Console.WriteLine("This Is The Service-List:");
+        var servicesResult = await _serviceService.ReadServiceAsync();
+        if (servicesResult is not Result<IEnumerable<ServiceDto>> serviceResult || !serviceResult.Success)
         {
-            Console.WriteLine("Failed to load roles or no roles available.");
+            Console.WriteLine("Failed to load services or no Servicec available.");
             Console.WriteLine("\nPress any key to return to the menu...");
             Console.ReadKey();
             return;
         }
 
-        var statuses = statusResult.Data.ToList();
-        if (!statuses.Any())
+        var services = serviceResult.Data.ToList();
+        if (!services.Any())
         {
-            Console.WriteLine("No status found.");
+            Console.WriteLine("No service found.");
             Console.WriteLine("\nPress any key to return to the menu...");
             Console.ReadKey();
             return;
@@ -174,14 +174,14 @@ public class ServiceMenuDialogs
 
         // Visa alla kunder
         int index = 1;
-        foreach (var status in statuses)
+        foreach (var service in services)
         {
-            Console.WriteLine($"{index}. Status-Name: {status.Name}");
+            Console.WriteLine($"{index}. Service-Name: {service.Name}");
             index++;
         }
 
-        Console.WriteLine("----Which Status Would You Like To Delete?");
-        if (!int.TryParse(Console.ReadLine(), out int choice) || choice <= 0 || choice > statuses.Count())
+        Console.WriteLine("----Which Service Would You Like To Delete?");
+        if (!int.TryParse(Console.ReadLine(), out int choice) || choice <= 0 || choice > services.Count())
         {
             Console.WriteLine("Invalid choice.");
             Console.WriteLine("\nPress any key to return to the menu...");
@@ -189,12 +189,12 @@ public class ServiceMenuDialogs
             return;
         }
 
-        var selectedStatus = statuses.ElementAt(choice - 1);
+        var selectedService = services.ElementAt(choice - 1);
 
-        Console.WriteLine($"Are you sure you want to delete this Status: {selectedStatus.Name}? (y/n)");
+        Console.WriteLine($"Are you sure you want to delete this Service: {selectedService.Name}? (y/n)");
         if (Console.ReadLine()?.ToLower() != "y")
         {
-            Console.WriteLine("Status deletion cancelled.");
+            Console.WriteLine("Service deletion cancelled.");
             Console.WriteLine("\nPress any key to return to the menu...");
             Console.ReadKey();
             return;
@@ -202,8 +202,8 @@ public class ServiceMenuDialogs
 
         try
         {
-            await _statusservice.DeleteStatusAsync(selectedStatus.Id);
-            Console.WriteLine("Role deleted successfully.");
+            await _serviceService.DeleteServiceEntity(selectedService.Id);
+            Console.WriteLine("Service deleted successfully.");
         }
         catch (Exception ex)
         {

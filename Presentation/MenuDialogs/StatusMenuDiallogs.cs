@@ -145,6 +145,7 @@ public async Task ShowStatusMenu()
                     Console.WriteLine($"Failed to update the Status: {result.ErrorMessage}");
                 }
             }
+        Console.ReadKey();
         }
     }
     
@@ -204,11 +205,11 @@ public async Task ShowStatusMenu()
         try
         {
         await _statusservice.DeleteStatusAsync(selectedStatus.Id);
-            Console.WriteLine("Role deleted successfully.");
+            Console.WriteLine("Status deleted successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to delete the customer. Error: {ex.Message}");
+            Console.WriteLine($"Failed to delete the status. Error: {ex.Message}");
         }
 
         Console.WriteLine("\nPress any key to return to the menu...");

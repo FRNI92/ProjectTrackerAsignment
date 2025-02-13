@@ -59,9 +59,9 @@ public class StatusService(IStatusRepository statusRepository)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"There was a problem with getting statuses:{ex.Message}");
-            Console.WriteLine(ex.StackTrace);
-            throw;
+            Debug.WriteLine($"There was a problem with getting statuses:{ex.Message}{ex.StackTrace}");
+            return Result.Error("There was an error when loading statuses");
+
         }
     }
 
