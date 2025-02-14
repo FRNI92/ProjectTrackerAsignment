@@ -153,6 +153,7 @@ public class RoleMenuDialog : IRoleMenuDialog
                 {
                     Console.WriteLine("Failed to update the Role.");
                 }
+                Console.ReadKey();
             }
         }
     }

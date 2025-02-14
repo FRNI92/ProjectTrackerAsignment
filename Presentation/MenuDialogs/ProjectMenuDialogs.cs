@@ -172,7 +172,6 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
 
 
 
-
         var employeesResult = await _employeeService.GetEmployeeAsync();
         if (employeesResult is Result<IEnumerable<EmployeeDto>> employeeResult && employeeResult.Success)
         {
@@ -258,22 +257,23 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
                     return;
                 }
 
-                Console.WriteLine("Select service:");
 
+                Console.WriteLine("Select service:");
                 for (int i = 0; i < services.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {services[i].Name} {services[i].Description}");//int i används både till att visa nummer för användaren och för att hitta rätt i index
+                    Console.WriteLine($"{i + 1}. {services[i].Name} {services[i].Description}");//int i+1 för att visa en siffra. sedan används int som index för att hitta rätt i listan
                 }
-
-                int selectedServiceIndex;
+                int selectedServiceIndex;//inget värde. ska användas senare
                 while (true)
                 {
                     Console.Write("Enter the number of the Service: ");
-                    var input = Console.ReadLine();
+                    var input = Console.ReadLine();// Nu får användaren välja i "listan"
 
+
+                    //is number och alla andra saker är true så flytta input till selectedServiceIndex
                     if (int.TryParse(input, out selectedServiceIndex) && selectedServiceIndex > 0 && selectedServiceIndex <= services.Count)
                     {
-                        newProject.ServiceId = services[selectedServiceIndex - 1].Id;
+                        newProject.ServiceId = services[selectedServiceIndex - 1].Id;//för att kompensera för index -1
                         break;
                     }
                     Console.WriteLine("Invalid selection. Please enter a valid number.");
@@ -289,7 +289,7 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
             {
                 // Om resultatet är framgångsrikt, hämta projektets namn
                 var createdProject = createdProjectData.Data;  // Använd createdProjectData.Data
-                Console.WriteLine($"Project created! Project name: {createdProject.Name} Total Cost: {createdProject.TotalPrice}");
+                Console.WriteLine($"Project created! Project name: {createdProject.Name} Total Cost: {createdProject.TotalPrice} :-");
             }
             else
             {
@@ -359,21 +359,129 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
                 Console.Write($"Enter new EndDate (leave blank to keep current:({selectedProject.EndDate}): ");
                 var newEndDate = Console.ReadLine();
 
-                Console.Write($"Enter new Status-ID (1 = Not started, 2 = In Progress, 3 = Completed): ) (leave blank to keep current:({selectedProject.StatusId}): ");
-                var newStatusId = Console.ReadLine();
 
-                Console.Write($"Enter new Customer-ID (1 = Company A:, 2 = Companny B): (leave blank to keep current:({selectedProject.CustomerId}): ");
-                var newCustomerId = Console.ReadLine();
 
-                Console.Write($"Enter new Service ID: (1 = IT-Support:, 2 = Consulting): (leave blank to keep current:({selectedProject.ServiceId}): ");
-                var newServiceId = Console.ReadLine();
+                var statusResult = await _statusService.ReadStatusAsync();
+                int selectedStatusId = 1; // Standardstatus ("Not Started")
+
+                if (statusResult is Result<IEnumerable<StatusDto>> statuses && statuses.Success)
+                {
+                    var statusList = statuses.Data.ToList();
+
+                    if (statusList.Any())
+                    {
+                        Console.WriteLine($"\nSelect Status (Leave blank to use default '{statusList[0].Name}'):");
+                        for (int i = 0; i < statusList.Count; i++)
+                        {
+                            Console.WriteLine($"{i + 1}. {statusList[i].Name}");
+                        }
+
+                        while (true)
+                        {
+                            Console.Write("\nEnter the number of the Status: ");
+                            var input = Console.ReadLine();
+
+                            if (string.IsNullOrWhiteSpace(input))
+                            {
+                                Console.WriteLine($"Using default Status: {statusList[0].Name}");
+                                break;
+                            }
+
+                            if (int.TryParse(input, out int statusChoice) && statusChoice > 0 && statusChoice <= statusList.Count)
+                            {
+                                selectedStatusId = statusList[statusChoice - 1].Id;
+                                Console.WriteLine($"Selected Status: {statusList[choice - 1].Name}");
+                                break;
+                            }
+
+                            Console.WriteLine("Invalid selection. Please enter a valid number.");
+                        }
+                    }
+                }
+                var newStatusId = selectedStatusId;
+                // Tilldela det valda StatusId till det nya projektet
+
+
+                int newCustomerId = selectedProject.CustomerId;
+                var customersResult = await _customerService.GetAllCustomerAsync();
+                if (customersResult is Result<IEnumerable<CustomerDto>> customerResult && customerResult.Success)
+                {
+                    var customers = customerResult.Data?.ToList();
+
+                    if (!customers.Any())
+                    {
+                        Console.WriteLine("No customers found.");
+                        Console.WriteLine("\nPress any key to return to the menu...");
+                        Console.ReadKey();
+                        return;
+                    }
+
+                    Console.WriteLine("Select customer:");
+
+                    for (int i = 0; i < customers.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {customers[i].Name} {customers[i].Email}");
+                    }
+
+                    int selectedCustomerIndex;
+                    while (true)
+                    {
+                        Console.Write("Enter the number of the Customer: ");
+                        var input = Console.ReadLine();
+
+                        if (int.TryParse(input, out selectedCustomerIndex) && selectedCustomerIndex > 0 && selectedCustomerIndex <= customers.Count)
+                        {
+                            newCustomerId = customers[selectedCustomerIndex - 1].Id;
+                            break;
+                        }
+
+                        Console.WriteLine("Invalid selection. Please enter a valid number.");
+                    }
+                }
+
+                var newServiceId = selectedProject.ServiceId; // Behåll nuvarande värde
+                var servicesResult = await _serviceService.ReadServiceAsync();
+                if (servicesResult is Result<IEnumerable<ServiceDto>> serviceResult && serviceResult.Success)
+                {
+                    var services = serviceResult.Data?.ToList();
+
+                    if (!services.Any())
+                    {
+                        Console.WriteLine("No services found.");
+                        Console.WriteLine("\nPress any key to return to the menu...");
+                        Console.ReadKey();
+                        return;
+                    }
+
+
+                    Console.WriteLine("Select service:");
+                    for (int i = 0; i < services.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {services[i].Name} {services[i].Description}");//int i+1 för att visa en siffra. sedan används int som index för att hitta rätt i listan
+                    }
+                    int selectedServiceIndex;//inget värde. ska användas senare
+                    while (true)
+                    {
+                        Console.Write("Enter the number of the Service: ");
+                        var input = Console.ReadLine();// Nu får användaren välja i "listan"
+
+
+                        //is number och alla andra saker är true så flytta input till selectedServiceIndex
+                        if (int.TryParse(input, out selectedServiceIndex) && selectedServiceIndex > 0 && selectedServiceIndex <= services.Count)
+                        {
+                            newServiceId = services[selectedServiceIndex - 1].Id;//för att kompensera för index -1
+                            break;
+                        }
+                        Console.WriteLine("Invalid selection. Please enter a valid number.");
+                    }
+                }
 
                 Console.Write($"Enter new Service-Duration:(leave blank to keep current:({selectedProject.Duration}): ");
                 var newServiceDuration = Console.ReadLine();
 
+
                 var employeesResult = await _employeeService.GetEmployeeAsync();//hämmta listan
                 int selectedEmployeeId = selectedProject.EmployeeId;//behåll det man har från början
-
                 //kollar om employeesResult är av rätt typ och får då ut en employeeResult som man också kolla om den är success
                 if (employeesResult is Result<IEnumerable<EmployeeDto>> employeeResult && employeeResult.Success)
                 {
@@ -422,9 +530,9 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
                     Description = string.IsNullOrWhiteSpace(newDescription) ? selectedProject.Description : newDescription,
                     StartDate = string.IsNullOrWhiteSpace(newStartDate) ? selectedProject.StartDate : DateTime.Parse(newStartDate),//behöver konverteras
                     EndDate = string.IsNullOrWhiteSpace(newEndDate) ? selectedProject.EndDate : DateTime.Parse(newEndDate),
-                    StatusId = string.IsNullOrWhiteSpace(newStatusId) ? selectedProject.StatusId : int.Parse(newStatusId),
-                    CustomerId = string.IsNullOrWhiteSpace(newCustomerId) ? selectedProject.CustomerId : int.Parse(newCustomerId),
-                    ServiceId = string.IsNullOrWhiteSpace(newServiceId) ? selectedProject.ServiceId : int.Parse(newServiceId),
+                    StatusId = newStatusId,
+                    CustomerId = newCustomerId,
+                    ServiceId = newServiceId,
                     Duration = string.IsNullOrWhiteSpace(newServiceDuration) ? selectedProject.Duration : int.Parse(newServiceDuration),
                     EmployeeId = selectedEmployeeId
                 };

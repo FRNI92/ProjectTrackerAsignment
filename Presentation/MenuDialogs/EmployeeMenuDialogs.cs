@@ -11,10 +11,12 @@ namespace Presentation.MenuDialogs;
 public class EmployeeMenuDialogs : IEmployeeMenuDialogs
 {
     private readonly IEmployeeService _employeeService;
+    private readonly IRoleService _roleService;
 
-    public EmployeeMenuDialogs(IEmployeeService employeeService)
+    public EmployeeMenuDialogs(IEmployeeService employeeService, IRoleService roleService)
     {
         _employeeService = employeeService;
+        _roleService = roleService;
     }
 
     public async Task ShowEmployeeMenuAsync()
@@ -91,27 +93,58 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
         Console.Write("Enter Employee Email: ");
         newEmployee.Email = Console.ReadLine()!;
 
-        Console.Write("Enter Employee Role ID: ");
-        // Försök att konvertera input till int
-        int roleId;
-        while (!int.TryParse(Console.ReadLine(), out roleId))
-        {
-            Console.Write("Invalid input. Please enter a valid Role ID: ");
-        }
 
-        newEmployee.RoleId = roleId;
-
-        var createdEmployee = await _employeeService.CreateEmployeeAsync(newEmployee);
-        if (createdEmployee.Success)
+        var rolesResult = await _roleService.GetAllRolesAsync();
+        if (rolesResult is Result<IEnumerable<RolesDto>> roleResult && roleResult.Success)
         {
-            Console.WriteLine($"Employee created: {newEmployee.FirstName} {newEmployee.LastName}");
-        }
-        else
-        {
-            Console.WriteLine($"Error: {createdEmployee.Success}");
-        }
+            var roles = roleResult.Data.ToList();
 
-        Console.ReadKey();
+            if (!roles.Any())
+            {
+                Console.WriteLine("No roles found.");
+                Console.WriteLine("\nPress any key to return to the menu...");
+                Console.ReadKey();
+                return;
+            }
+
+            // Visa roller som en numrerad lista
+            Console.WriteLine("Select Employee Role:");
+            for (int i = 0; i < roles.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {roles[i].Name}");
+            }
+
+            int selectedRoleId = 0; //standard
+            while (true)
+            {
+                Console.Write("\nEnter the number of the Role: ");
+                var input = Console.ReadLine();
+
+                if (int.TryParse(input, out int roleChoice) && roleChoice > 0 && roleChoice <= roles.Count)
+                {
+                    selectedRoleId = roles[roleChoice - 1].Id; // Hämtar rätt RoleId baserat på valet
+                    Console.WriteLine($"Selected Role: {roles[roleChoice - 1].Name}");
+                    break;
+                }
+
+                Console.WriteLine("Invalid selection. Please enter a valid number.");
+            }
+
+            // Tilldela den valda rollen till newEmployee
+            newEmployee.RoleId = selectedRoleId;
+
+            var createdEmployee = await _employeeService.CreateEmployeeAsync(newEmployee);
+            if (createdEmployee.Success)
+            {
+                Console.WriteLine($"Employee created: {newEmployee.FirstName} {newEmployee.LastName} with the role {newEmployee.RoleName}");
+            }
+            else
+            {
+                Console.WriteLine($"Error: {createdEmployee.Success}");
+            }
+
+            Console.ReadKey();
+        }
     }
 
     private async Task UpdateEmployeeAsync()
@@ -157,22 +190,61 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                 var newLastName = Console.ReadLine();
                 Console.Write($"Enter new Email (leave blank to keep current:({selectedEmployee.Email}): ");
                 var newEmail = Console.ReadLine();
-                Console.Write($"Enter new Role (leave blank to keep current:({selectedEmployee.RoleId}): ");
-                var newRoleId = Console.ReadLine();
 
-                var updatedEmployee = new EmployeeDto
+
+                var rolesResult = await _roleService.GetAllRolesAsync();
+                if (rolesResult is Result<IEnumerable<RolesDto>> roleResult && roleResult.Success)
                 {
-                    Id = selectedEmployee.Id, // Skicka ID:t istället för att söka med namn
-                    FirstName = string.IsNullOrWhiteSpace(newFirstName) ? selectedEmployee.FirstName : newFirstName,//tom eller null behåll gamla : annar newName
-                    LastName = string.IsNullOrWhiteSpace(newLastName) ? selectedEmployee.LastName : newLastName,
-                    Email = string.IsNullOrWhiteSpace(newEmail) ? selectedEmployee.Email : (newEmail),
-                    RoleId = string.IsNullOrWhiteSpace(newRoleId) ? selectedEmployee.RoleId : int.Parse(newRoleId)
-                };
+                    var roles = roleResult.Data.ToList();
 
-                await _employeeService.UpdateEmployeeAsync(updatedEmployee.Id, updatedEmployee);
-                Console.WriteLine("\nemployee updated successfully!");
-                Console.WriteLine("\nPress any key to return to the menu...");
-                Console.ReadKey();
+                    if (!roles.Any())
+                    {
+                        Console.WriteLine("No roles found.");
+                        Console.WriteLine("\nPress any key to return to the menu...");
+                        Console.ReadKey();
+                        return;
+                    }
+
+                    // Visa roller som en numrerad lista
+                    Console.WriteLine("Select Employee Role:");
+                    for (int i = 0; i < roles.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {roles[i].Name}");
+                    }
+
+                    int selectedRoleId = 0; //standard
+                    while (true)
+                    {
+                        Console.Write("\nEnter the number of the Role: ");
+                        var input = Console.ReadLine();
+
+                        if (int.TryParse(input, out int roleChoice) && roleChoice > 0 && roleChoice <= roles.Count)
+                        {
+                            selectedRoleId = roles[roleChoice - 1].Id; // Hämtar rätt RoleId baserat på valet
+                            Console.WriteLine($"Selected Role: {roles[roleChoice - 1].Name}");
+                            break;
+                        }
+
+                        Console.WriteLine("Invalid selection. Please enter a valid number.");
+                    }
+
+                    // Tilldela den valda rollen till newEmployee
+
+                    var newRoleId = selectedRoleId;
+                    var updatedEmployee = new EmployeeDto
+                    {
+                        Id = selectedEmployee.Id, // Skicka ID:t istället för att söka med namn
+                        FirstName = string.IsNullOrWhiteSpace(newFirstName) ? selectedEmployee.FirstName : newFirstName,//tom eller null behåll gamla : annar newName
+                        LastName = string.IsNullOrWhiteSpace(newLastName) ? selectedEmployee.LastName : newLastName,
+                        Email = string.IsNullOrWhiteSpace(newEmail) ? selectedEmployee.Email : (newEmail),
+                        RoleId = newRoleId
+                    };
+
+                    await _employeeService.UpdateEmployeeAsync(updatedEmployee.Id, updatedEmployee);
+                    Console.WriteLine("\nemployee updated successfully!");
+                    Console.WriteLine("\nPress any key to return to the menu...");
+                    Console.ReadKey();
+                }
             }
         }
     }
@@ -248,7 +320,6 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
         Console.WriteLine("\nPress any key to return to the menu...");
         Console.ReadKey();
     }
-
 }
 
 
