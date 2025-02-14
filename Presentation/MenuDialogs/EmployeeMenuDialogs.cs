@@ -134,13 +134,17 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
             newEmployee.RoleId = selectedRoleId;
 
             var createdEmployee = await _employeeService.CreateEmployeeAsync(newEmployee);
-            if (createdEmployee.Success)
+            if (createdEmployee is Result<EmployeeDto> employeeResult)//MÅSTE KÖR EN IS FÖR ATT KOMMA ÅT DATAN!!!!!!!!
             {
-                Console.WriteLine($"Employee created: {newEmployee.FirstName} {newEmployee.LastName} with the role {newEmployee.RoleName}");
+                Console.WriteLine($"Employee created: " +
+                    $"{employeeResult.Data.FirstName} " +
+                    $"{employeeResult.Data.LastName} with the role " +
+                    $"{employeeResult.Data.RoleName}");
             }
+
             else
             {
-                Console.WriteLine($"Error: {createdEmployee.Success}");
+                Console.WriteLine($"Error: {createdEmployee.ErrorMessage}");
             }
 
             Console.ReadKey();

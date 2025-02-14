@@ -12,19 +12,21 @@ public class EmployeeService : IEmployeeService
 {
     private readonly IEmployeeRepository _employeeRepository;
 
+
     public EmployeeService(IEmployeeRepository employeeRepository)
     {
         _employeeRepository = employeeRepository;
+
     }
     public async Task<IResult> CreateEmployeeAsync(EmployeeDto employeeDto)
     {
         if (employeeDto == null)
         {
-           return Result.BadRequest("Employee Dto was not filled in correcly");
+            return Result.BadRequest("Employee Dto was not filled in correcly");
         }
 
         await _employeeRepository.BeginTransactionAsync();
-        
+
         try
         {
             bool exists = await _employeeRepository.DoesEntityExistAsync(e => e.Email == employeeDto.Email);
@@ -33,10 +35,9 @@ public class EmployeeService : IEmployeeService
                 await _employeeRepository.RollBackTransactionAsync();
                 return Result.AlreadyExists("An employee with this email already exists.");
             }
-
             var newEmployeeEntity = EmployeeFactory.ToEntity(employeeDto);
-            var CreatedEmployee = await _employeeRepository.AddAsync(newEmployeeEntity);
-            if (CreatedEmployee == false)
+            var createdEmployee = await _employeeRepository.AddAsync(newEmployeeEntity);
+            if (createdEmployee == false)
             {
                 await _employeeRepository.RollBackTransactionAsync();
                 return Result.BadRequest("Could not save the employee");
@@ -46,7 +47,13 @@ public class EmployeeService : IEmployeeService
             if (isSaved > 0)
             {
                 await _employeeRepository.CommitTransactionAsync();
-                return Result.OK();
+
+                // 🔹 Hämta den sparade anställda från databasen
+                var savedEmployee = await _employeeRepository.GetAsync(e => e.Id == newEmployeeEntity.Id);
+
+                // 🔹 Konvertera till DTO och returnera det
+                var employeeDtoWithRole = EmployeeFactory.ToDto(savedEmployee);
+                return Result<EmployeeDto>.OK(employeeDtoWithRole);
             }
 
             await _employeeRepository.RollBackTransactionAsync();

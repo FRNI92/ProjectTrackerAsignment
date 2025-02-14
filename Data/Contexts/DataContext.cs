@@ -42,7 +42,8 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
             new EmployeesEntity { Id = 2, FirstName = "Johan", LastName = "Johansson", Email = "johan@company.com", RoleId = 2 },
             new EmployeesEntity { Id = 3, FirstName = "Maria", LastName = "Karlsson", Email = "Maria@company.com", RoleId = 1 }
         );
-    modelBuilder.Entity<ProjectEntity>().HasData(
+
+        modelBuilder.Entity<ProjectEntity>().HasData(
             new ProjectEntity { Id = 1,ProjectNumber = "P-101", Name = "Projekt A", Description = "Första projektet", StartDate = new DateTime(2024, 1, 1), StatusId = 1, CustomerId = 1, ServiceId = 1, EmployeeId = 1, },
             new ProjectEntity { Id = 2,ProjectNumber = "P-102", Name = "Projekt B", Description = "Andra projektet", StartDate = new DateTime(2024, 1, 1), StatusId = 2, CustomerId = 2, ServiceId = 2, EmployeeId = 2, }
         );
