@@ -137,7 +137,6 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
             Console.WriteLine($"Error in UpdateAsync:{ex.Message}");
             return null!;
         }
-
     }
     //transactionManagement
 

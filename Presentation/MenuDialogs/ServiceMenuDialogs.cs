@@ -79,6 +79,31 @@ public class ServiceMenuDialogs : IServiceMenuDialogs
         Console.Write("Enter Service name: ");
         newService.Name = Console.ReadLine()!;
 
+        Console.Write("Enter Service name: ");
+        newService.Description = Console.ReadLine()!;
+
+        while (true)
+        {
+            Console.Write("Enter Service duration (hours): ");
+            if (decimal.TryParse(Console.ReadLine(), out decimal duration) && duration > 0)
+            {
+                newService.Duration = duration;
+                break;
+            }
+            Console.WriteLine("Invalid input. Please enter a valid number for duration.");
+        }
+
+        while (true)
+        {
+            Console.Write("Enter Service price: ");
+            if (decimal.TryParse(Console.ReadLine(), out decimal price) && price > 0)
+            {
+                newService.Price = price;
+                break;
+            }
+            Console.WriteLine("Invalid input. Please enter a valid number for price.");
+        }
+
         var createdNewService = await _serviceService.CreateServiceAsync(newService);
         if (createdNewService.Success)
         {
@@ -115,6 +140,9 @@ public class ServiceMenuDialogs : IServiceMenuDialogs
             foreach (var serviceData in servicesData!)
             {
                 Console.WriteLine($"{index}.Service Name: {serviceData.Name}\t");
+                Console.WriteLine($"Description: {serviceData.Description}\t");
+                Console.WriteLine($"Duration: {serviceData.Duration} Hours\t");
+                Console.WriteLine($"Price: {serviceData.Price} SEK\t");
                 Console.WriteLine("------------------------------------");
                 index++;
             }
@@ -144,6 +172,7 @@ public class ServiceMenuDialogs : IServiceMenuDialogs
                     Console.WriteLine($"Failed to update the Status: {result.ErrorMessage}");
                 }
             }
+            Console.ReadKey();
         }
     }
 

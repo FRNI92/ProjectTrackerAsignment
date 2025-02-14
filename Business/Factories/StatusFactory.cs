@@ -24,8 +24,4 @@ public static class StatusFactory
         };
     }
 
-    public static void UpdatedEntity(StatusEntity entity, StatusDto dto)
-    {
-        entity.Name = dto.Name;
-    }
 }

@@ -3,6 +3,7 @@ using Business.Interfaces;
 using Business.Models;
 using Business.Services;
 using Presentation.Interfaces;
+using System.Transactions;
 
 namespace Presentation.MenuDialogs;
 
@@ -198,7 +199,9 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
                 Console.Write("Enter the number of the Employee: ");
                 var input = Console.ReadLine();
 
-                if (int.TryParse(input, out selectedEmployeeIndex) && selectedEmployeeIndex > 0 && selectedEmployeeIndex <= employees.Count)
+                if (int.TryParse(input, out selectedEmployeeIndex) 
+                    && selectedEmployeeIndex > 0 
+                    && selectedEmployeeIndex <= employees.Count)
                 {
                     newProject.EmployeeId = employees[selectedEmployeeIndex - 1].Id;
                     break;
@@ -225,7 +228,11 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
 
                 for (int i = 0; i < customers.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {customers[i].Name} {customers[i].Email}");
+                    Console.WriteLine($"" +
+                        $"{i + 1}. " +
+                        $"{customers[i].Name} " +
+                        $"{customers[i].Email} " +
+                        $"{customers[i].PhoneNumber}");
                 }
 
                 int selectedCustomerIndex;
@@ -234,7 +241,9 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
                     Console.Write("Enter the number of the Customer: ");
                     var input = Console.ReadLine();
 
-                    if (int.TryParse(input, out selectedCustomerIndex) && selectedCustomerIndex > 0 && selectedCustomerIndex <= employees.Count)
+                    if (int.TryParse(input, out selectedCustomerIndex) 
+                        && selectedCustomerIndex > 0 
+                        && selectedCustomerIndex <= customers.Count)
                     {
                         newProject.CustomerId = customers[selectedCustomerIndex - 1].Id;
                         break;
@@ -279,8 +288,22 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
                     Console.WriteLine("Invalid selection. Please enter a valid number.");
                 }
             }
-            Console.Write("Enter Duration (in hours): ");
-            newProject.Duration = decimal.Parse(Console.ReadLine()!);
+
+            decimal duration;
+            while (true)
+            {
+                Console.Write("Enter the duration (in hours): ");
+                var input = Console.ReadLine();
+
+                if (decimal.TryParse(input, out duration) && duration > 0)
+                {
+                    break; // Går ur loopen om inmatningen är giltig
+                }
+
+                Console.WriteLine("Invalid input. Please enter a valid number.");
+            }
+
+            newProject.Duration = duration;
 
 
             var createdProjectResult = await _projectService.CreateProjectAsync(newProject);
@@ -539,7 +562,7 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
 
                 // Uppdatera kunden
                 await _projectService.UpdateProjectAsync(updatedProject);
-                Console.WriteLine("\nCustomer updated successfully!");
+                Console.WriteLine("\nProject updated successfully!");
                 Console.WriteLine("\nPress any key to return to the menu...");
                 Console.ReadKey();
             }
@@ -555,10 +578,10 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
     private async Task DeleteProjectAsync()
     {
         Console.Clear();
-        Console.WriteLine("\tCUSTOMER-MANAGER");
-        Console.WriteLine("\tDelete Customer");
+        Console.WriteLine("\tPROJECT-MANAGER");
+        Console.WriteLine("\tDelete Project");
 
-        Console.WriteLine("This Is The Customer List:");
+        Console.WriteLine("This Is The Project List:");
 
         // Hämta alla projekt
         var projectsResult = await _projectService.GetAllProjectAsync();

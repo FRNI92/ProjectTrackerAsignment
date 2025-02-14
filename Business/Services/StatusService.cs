@@ -91,8 +91,8 @@ public class StatusService(IStatusRepository statusRepository) : IStatusService
             }
             else
             {
-                StatusFactory.UpdatedEntity(existingEntity, statusDto);
-                var updatedStatus = await _statusRepository.TransactionUpdateAsync(s => s.Id == statusDto.Id, existingEntity);
+                var updateEntity = StatusFactory.ToEntity(statusDto);
+                var updatedStatus = await _statusRepository.TransactionUpdateAsync(s => s.Id == statusDto.Id, updateEntity);
 
                 if (updatedStatus != null)
                 {

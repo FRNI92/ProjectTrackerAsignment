@@ -86,9 +86,14 @@ public class ServiceService : IServiceService
                 await _serviceRepository.RollBackTransactionAsync();
                 return Result.NotFound("Could not find the service to update");
             }
-            // Update entity values
-            var updatedEntity = ServiceFactory.ToEntity(serviceDto);
-            var updatedService = await _serviceRepository.TransactionUpdateAsync(s => s.Id == serviceDto.Id, updatedEntity);
+
+            // ✅ Behåll gamla värden om fältet är tomt
+            existingEntity.Name = string.IsNullOrWhiteSpace(serviceDto.Name) ? existingEntity.Name : serviceDto.Name;
+            existingEntity.Description = string.IsNullOrWhiteSpace(serviceDto.Description) ? existingEntity.Description : serviceDto.Description;
+            existingEntity.Duration = serviceDto.Duration > 0 ? serviceDto.Duration : existingEntity.Duration;
+            existingEntity.Price = serviceDto.Price > 0 ? serviceDto.Price : existingEntity.Price;
+
+            var updatedService = await _serviceRepository.TransactionUpdateAsync(s => s.Id == serviceDto.Id, existingEntity);
 
             if (updatedService == null)
             {
@@ -100,8 +105,7 @@ public class ServiceService : IServiceService
             if (saveResult > 0)
             {
                 await _serviceRepository.CommitTransactionAsync();
-                var serviceToMenu = ServiceFactory.ToDto(updatedService);
-                return Result<ServiceDto>.OK(serviceToMenu);
+                return Result<ServiceDto>.OK(ServiceFactory.ToDto(updatedService));
             }
 
             await _serviceRepository.RollBackTransactionAsync();
@@ -114,6 +118,7 @@ public class ServiceService : IServiceService
             return Result.Error("There was an error when updating the service");
         }
     }
+        
 
     public async Task<IResult> DeleteServiceEntity(int id)
     {
