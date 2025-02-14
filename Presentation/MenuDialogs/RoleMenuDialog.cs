@@ -151,7 +151,7 @@ public class RoleMenuDialog : IRoleMenuDialog
                 }
                 else
                 {
-                    Console.WriteLine("Failed to update the Role.");
+                    Console.WriteLine($"Error: {result.ErrorMessage}");
                 }
                 Console.ReadKey();
             }

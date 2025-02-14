@@ -29,13 +29,4 @@ public static class ServiceFactory
             Price = dto.Price,
         };
     }
-
-    public static void UpdateEntity(ServiceEntity entity, ServiceDto dto)
-    {
-        //entity.Id = dto.Id; uppdatera inte ID!:D
-        entity.Name = dto.Name;
-        entity.Description = dto.Description;
-        entity.Duration = dto.Duration;
-        entity.Price = dto.Price;
-    }
 }

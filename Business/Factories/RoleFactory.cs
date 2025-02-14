@@ -29,13 +29,6 @@ public static class RoleFactory
             Description = rolesEntity.Description,
         };
     }
-
-    public static void UpdateEntity(RolesEntity entity, RolesDto dto) 
-    {
-        // Viktigt: ÄNDRA INTE entity.Id
-        entity.Name = dto.Name;
-        entity.Description = dto.Description;
-    }
 }
 
     

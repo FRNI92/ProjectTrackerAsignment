@@ -89,9 +89,8 @@ public class RoleService(IRolesRepository rolesRepository) : IRoleService
                 return Result.NotFound($"Could not find a role with that id {updatedRolesDto.Id}");
             }
 
-            // Update entity values
-            RoleFactory.UpdateEntity(existingRole, updatedRolesDto);
-            var result = await _rolesRepository.TransactionUpdateAsync(r => r.Id == updatedRolesDto.Id, existingRole);
+            var updatedEntity = RoleFactory.ToEntity(updatedRolesDto);
+            var result = await _rolesRepository.TransactionUpdateAsync(r => r.Id == updatedRolesDto.Id, updatedEntity);
 
             if (result == null)
             {
@@ -113,7 +112,7 @@ public class RoleService(IRolesRepository rolesRepository) : IRoleService
         catch (Exception ex)
         {
             await _rolesRepository.RollBackTransactionAsync();
-            Console.WriteLine($"An error occurred when updating roles: {ex.Message}{ex.StackTrace}");
+            Debug.WriteLine($"An error occurred when updating roles: {ex.Message}{ex.StackTrace}");
             return Result.Error("There was an error with updating roles");
         }
     }

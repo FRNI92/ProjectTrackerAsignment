@@ -87,8 +87,8 @@ public class ServiceService : IServiceService
                 return Result.NotFound("Could not find the service to update");
             }
             // Update entity values
-            ServiceFactory.UpdateEntity(existingEntity, serviceDto);
-            var updatedService = await _serviceRepository.TransactionUpdateAsync(s => s.Id == serviceDto.Id, existingEntity);
+            var updatedEntity = ServiceFactory.ToEntity(serviceDto);
+            var updatedService = await _serviceRepository.TransactionUpdateAsync(s => s.Id == serviceDto.Id, updatedEntity);
 
             if (updatedService == null)
             {
