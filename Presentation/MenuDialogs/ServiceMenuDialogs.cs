@@ -1,4 +1,5 @@
 ﻿using Business.Dtos;
+using Business.Interfaces;
 using Business.Models;
 using Business.Services;
 using Presentation.Interfaces;
@@ -7,14 +8,12 @@ namespace Presentation.MenuDialogs;
 
 public class ServiceMenuDialogs : IServiceMenuDialogs
 {
-    private readonly ServiceService _serviceService;
+    private readonly IServiceService _serviceService;
 
-    public ServiceMenuDialogs(ServiceService serviceService)
+    public ServiceMenuDialogs(IServiceService serviceService)
     {
         _serviceService = serviceService;
     }
-
-    private readonly StatusService _statusservice;
 
     public async Task ShowServicesMenu()
     {

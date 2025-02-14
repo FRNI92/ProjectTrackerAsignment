@@ -160,8 +160,8 @@ public class RoleMenuDialog : IRoleMenuDialog
     private async Task DeleteRoleAsync()
     {
         Console.Clear();
-        Console.WriteLine("CUSTOMER-MANAGER");
-        Console.WriteLine("\tDelete Customer");
+        Console.WriteLine("ROLE-MANAGER");
+        Console.WriteLine("\tDelete Role");
 
         Console.WriteLine("This Is The Role-List:");
         var rolesResult = await _roleService.GetAllRolesAsync();
@@ -205,7 +205,7 @@ public class RoleMenuDialog : IRoleMenuDialog
         Console.WriteLine($"Are you sure you want to delete this Role: {selectedRole.Name}? (y/n)");
         if (Console.ReadLine()?.ToLower() != "y")
         {
-            Console.WriteLine("Customer deletion cancelled.");
+            Console.WriteLine("Role deletion cancelled.");
             Console.WriteLine("\nPress any key to return to the menu...");
             Console.ReadKey();
             return;
@@ -219,7 +219,7 @@ public class RoleMenuDialog : IRoleMenuDialog
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to delete the customer. Error: {ex.Message}");
+            Console.WriteLine($"Failed to delete the role. Error: {ex.Message}");
         }
 
         Console.WriteLine("\nPress any key to return to the menu...");

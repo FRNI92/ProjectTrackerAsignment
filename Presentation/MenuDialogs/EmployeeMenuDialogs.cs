@@ -69,7 +69,7 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
         }
         else
         {
-            Console.WriteLine("No projects found.");
+            Console.WriteLine("No employee found.");
         }
 
         Console.WriteLine("\nPress any key to return to the menu...");
@@ -170,7 +170,7 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                 };
 
                 await _employeeService.UpdateEmployeeAsync(updatedEmployee.Id, updatedEmployee);
-                Console.WriteLine("\nCustomer updated successfully!");
+                Console.WriteLine("\nemployee updated successfully!");
                 Console.WriteLine("\nPress any key to return to the menu...");
                 Console.ReadKey();
             }
@@ -219,16 +219,16 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
 
                 if (confirmation?.ToLower() == "y")
                 {
-                    Console.WriteLine($"Deleting project: {selectedEmployee.FirstName}");
+                    Console.WriteLine($"Deleting employee: {selectedEmployee.FirstName}");
 
                     try
                     {
                         await _employeeService.DeleteEmployeeByIdAsync(selectedEmployee.Id);
-                        Console.WriteLine("Project deleted successfully.");
+                        Console.WriteLine("Employee deleted successfully.");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Failed to delete the Project. Error: {ex.Message}");
+                        Console.WriteLine($"Failed to delete the Employee. Error: {ex.Message}");
                     }
                 }
                 else

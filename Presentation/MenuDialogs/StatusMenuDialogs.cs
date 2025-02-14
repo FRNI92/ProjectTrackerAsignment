@@ -8,9 +8,9 @@ namespace Presentation.MenuDialogs;
 
 public class StatusMenuDialogs : IStatusMenuDialogs
 {
-    private readonly StatusService _statusservice;
+    private readonly IStatusService _statusservice;
 
-    public StatusMenuDialogs(StatusService statusservice)
+    public StatusMenuDialogs(IStatusService statusservice)
     {
         _statusservice = statusservice;
     }

@@ -32,7 +32,7 @@ public class RoleService(IRolesRepository rolesRepository) : IRoleService
             var newEntity = RoleFactory.ToEntity(rolesDto);
 
             var addedEntity = await _rolesRepository.AddAsync(newEntity);
-            if (addedEntity == true)
+            if (addedEntity == false)
             {
                 await _rolesRepository.RollBackTransactionAsync();
                 return Result.Error("Could not add role");

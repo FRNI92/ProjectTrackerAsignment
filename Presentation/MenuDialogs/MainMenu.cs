@@ -4,19 +4,19 @@ namespace Presentation.MenuDialogs;
 
 public class MainMenu : IMainMenu
 {
-    private readonly ProjectMenuDialogs _projectMenuDialogs;
-    private readonly CustomerMenuDialogs _customerMenuDialogs;
-    private readonly EmployeeMenuDialogs _employeeMenuDialogs;
-    private readonly RoleMenuDialog _roleMenuDialog;
-    private readonly StatusMenuDialogs _statusMenuDiallogs;
-    private readonly ServiceMenuDialogs _serviceMenuDialogs;
-    public MainMenu(ProjectMenuDialogs projectMenuDialogs, CustomerMenuDialogs customerMenuDialogs, EmployeeMenuDialogs employeeMenuDialogs, RoleMenuDialog roleMenuDialog, StatusMenuDialogs statusMenuDiallogs, ServiceMenuDialogs serviceMenuDialogs)
+    private readonly IProjectMenuDialogs _projectMenuDialogs;
+    private readonly ICustomerMenuDialogs _customerMenuDialogs;
+    private readonly IEmployeeMenuDialogs _employeeMenuDialogs;
+    private readonly IRoleMenuDialog _roleMenuDialog;
+    private readonly IStatusMenuDialogs _statusMenuDialogs;
+    private readonly IServiceMenuDialogs _serviceMenuDialogs;
+    public MainMenu(IProjectMenuDialogs projectMenuDialogs, ICustomerMenuDialogs customerMenuDialogs, IEmployeeMenuDialogs employeeMenuDialogs, IRoleMenuDialog roleMenuDialog, IStatusMenuDialogs statusMenuDialogs, IServiceMenuDialogs serviceMenuDialogs)
     {
         _projectMenuDialogs = projectMenuDialogs;
         _customerMenuDialogs = customerMenuDialogs;
         _employeeMenuDialogs = employeeMenuDialogs;
         _roleMenuDialog = roleMenuDialog;
-        _statusMenuDiallogs = statusMenuDiallogs;
+        _statusMenuDialogs = statusMenuDialogs;
         _serviceMenuDialogs = serviceMenuDialogs;
     }
 
@@ -56,7 +56,7 @@ public class MainMenu : IMainMenu
                     break;
 
                 case "5":
-                    await _statusMenuDiallogs.ShowStatusMenu();
+                    await _statusMenuDialogs.ShowStatusMenu();
                     break;
 
                 case "6":
