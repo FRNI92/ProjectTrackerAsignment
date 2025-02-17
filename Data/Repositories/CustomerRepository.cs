@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories;
 
-public class CustomerRepository : BaseRepository<CustomerEntity>, ICustomerRepository
+public class CustomerRepository : BaseRepository<CustomersEntity>, ICustomerRepository
 {
     private readonly DataContext _context;
 

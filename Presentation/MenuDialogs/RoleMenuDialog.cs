@@ -1,7 +1,9 @@
 ﻿using Business.Dtos;
 using Business.Interfaces;
 using Business.Models;
+using Microsoft.AspNetCore.Rewrite;
 using Presentation.Interfaces;
+using System;
 
 
 namespace Presentation.MenuDialogs;
@@ -56,7 +58,7 @@ public class RoleMenuDialog : IRoleMenuDialog
     private async Task ShowRolesAsync()
     {
         var roles = await _roleService.GetAllRolesAsync();
-        if (roles is Result<IEnumerable<RolesDto>> roleResult)
+        if (roles is Result<IEnumerable<RolesDto>> roleResult && roleResult.Success)
         {
             var rolesData = roleResult.Data;
             foreach (var role in rolesData)
@@ -64,10 +66,11 @@ public class RoleMenuDialog : IRoleMenuDialog
 
                 Console.WriteLine($" Name: {role.Name}, Role Description: {role.Description}");
             }
+            Console.WriteLine(roles.StatusCode);
         }
         else
         {
-            Result.Error("Error when loading customers");
+            Console.WriteLine($"{roles.ErrorMessage} {roles.StatusCode}");
         }
         Console.ReadKey();
     }
@@ -202,7 +205,7 @@ public class RoleMenuDialog : IRoleMenuDialog
 
         var selectedRole = roles.ElementAt(choice - 1);
 
-        // Be om bekräftelse innan radering
+        // be om bekräftelse innan radering
         Console.WriteLine($"Are you sure you want to delete this Role: {selectedRole.Name}? (y/n)");
         if (Console.ReadLine()?.ToLower() != "y")
         {

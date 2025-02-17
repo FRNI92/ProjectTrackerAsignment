@@ -2,7 +2,7 @@
 
 namespace Data.Interfaces;
 
-public interface ICustomerRepository : IBaseRepository<CustomerEntity>
+public interface ICustomerRepository : IBaseRepository<CustomersEntity>
 {
 
 }

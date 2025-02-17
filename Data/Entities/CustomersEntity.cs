@@ -2,7 +2,7 @@
 
 namespace Data.Entities;
 
-public class CustomerEntity
+public class CustomersEntity
 {
     [Key]
     public int Id { get; set; } // Primärnyckel

@@ -62,15 +62,15 @@ public class RoleService(IRolesRepository rolesRepository) : IRoleService
             var rolesList = await _rolesRepository.GetAllAsync();
 
             if (!rolesList.Any())
-                Console.WriteLine("There are no Roles here");
+                return Result.NotFound("There are no Roles here");
+
             var rolesDto = rolesList.Select(RoleFactory.ToDto);
-            return Result<IEnumerable<RolesDto>>.OK(rolesDto);
+            return Result<IEnumerable<RolesDto>>.OK(rolesDto, "Roles Fetched successfully");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error when Getting Roles:{ex.Message}");
-            Console.WriteLine(ex.StackTrace);
-            return Result.NotFound("could not find any roles");
+            Debug.WriteLine($"Error when Getting Roles:{ex.Message}{ex.StackTrace}");
+            return Result.Error("Error when getting Roles");
         }
     }
 

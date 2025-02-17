@@ -9,6 +9,8 @@ public abstract class Result : IResult
 
     public string? ErrorMessage { get; protected set; }
 
+    public string? Message { get; protected set; }
+
     public static Result OK()
     {
         return new SuccessResult(200);
@@ -40,13 +42,14 @@ public class Result<T> : Result
 {
     public T? Data { get; private set; }
 
-    public static Result<T> OK(T? data)
+    public static Result<T> OK(T? data, string? message = null)
     {
         return new Result<T>
         {
             Success = true,
             StatusCode = 200,
-            Data = data
+            Data = data,
+            Message = message
         };
     }
 }

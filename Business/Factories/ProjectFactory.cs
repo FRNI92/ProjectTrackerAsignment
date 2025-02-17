@@ -17,7 +17,7 @@ public static class ProjectFactory
     {
         return new ProjectEntity
         {
-            Id = projectDto.Id,
+            //Id = projectDto.Id,
             ProjectNumber = projectDto.ProjectNumber,
             Name = projectDto.Name,
             Description = projectDto.Description,
@@ -54,18 +54,18 @@ public static class ProjectFactory
             Duration = projectEntity.Duration, // Projektets specifika duration
             TotalPrice = projectEntity.TotalPrice,
 
-            StatusId = projectEntity.StatusId,
+            StatusId = projectEntity.StatusId,//ser om detta kan hjälpa så att project är kvar när "status" försvinner
             StatusName = projectEntity.Status?.Name ?? "No status assigned",// hantera null under utveckling
-            
+
             CustomerId = projectEntity.CustomerId,
             CustomerName = projectEntity.Customer?.Name ?? "No customer",
-            
+
             EmployeeId = projectEntity.EmployeeId,
             EmployeeName = projectEntity.Employee?.FirstName ?? "No employee",
-            
+
             ServiceId = projectEntity.ServiceId,
             ServiceName = projectEntity.Service?.Name ?? "No service",
-           
+
         };
     }
 }

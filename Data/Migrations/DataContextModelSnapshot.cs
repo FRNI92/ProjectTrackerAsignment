@@ -22,7 +22,7 @@ namespace Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
+            modelBuilder.Entity("Data.Entities.CustomersEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,13 +63,6 @@ namespace Data.Migrations
                             Email = "contact@companyB.com",
                             Name = "Company B",
                             PhoneNumber = "987654321"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "contact@companyC.com",
-                            Name = "Company c",
-                            PhoneNumber = "987988976"
                         });
                 });
 
@@ -106,26 +99,18 @@ namespace Data.Migrations
                         new
                         {
                             Id = 1,
-                            Email = "anna@company.com",
-                            FirstName = "Anna",
-                            LastName = "Andersson",
+                            Email = "Fredrik@domain.com",
+                            FirstName = "Fredrik",
+                            LastName = "Nilsson",
                             RoleId = 1
                         },
                         new
                         {
                             Id = 2,
-                            Email = "johan@company.com",
-                            FirstName = "Johan",
-                            LastName = "Johansson",
+                            Email = "Hans@domain.com",
+                            FirstName = "Hans",
+                            LastName = "Andersson",
                             RoleId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "Maria@company.com",
-                            FirstName = "Maria",
-                            LastName = "Karlsson",
-                            RoleId = 1
                         });
                 });
 
@@ -190,27 +175,14 @@ namespace Data.Migrations
                             Id = 1,
                             CustomerId = 1,
                             Description = "Första projektet",
-                            Duration = 0m,
+                            Duration = 10m,
                             EmployeeId = 1,
+                            EndDate = new DateTime(2024, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Projekt A",
                             ProjectNumber = "P-101",
                             ServiceId = 1,
                             StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             StatusId = 1,
-                            TotalPrice = 0m
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CustomerId = 2,
-                            Description = "Andra projektet",
-                            Duration = 0m,
-                            EmployeeId = 2,
-                            Name = "Projekt B",
-                            ProjectNumber = "P-102",
-                            ServiceId = 2,
-                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            StatusId = 2,
                             TotalPrice = 0m
                         });
                 });
@@ -238,14 +210,20 @@ namespace Data.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Full access",
+                            Description = "Administrator role with full permissions",
                             Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Limited access",
+                            Description = "Regular user role with limited permissions",
                             Name = "User"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Role for project managers",
+                            Name = "Manager"
                         });
                 });
 
@@ -278,18 +256,18 @@ namespace Data.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Technical support",
-                            Duration = 2m,
-                            Name = "IT Support",
-                            Price = 500m
+                            Description = "Advice and feedback",
+                            Duration = 10m,
+                            Name = "Consulting",
+                            Price = 1000m
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Business consulting",
-                            Duration = 5m,
-                            Name = "Consulting",
-                            Price = 1500m
+                            Description = "Hardware and software",
+                            Duration = 1m,
+                            Name = "IT-Support",
+                            Price = 500m
                         });
                 });
 
@@ -340,7 +318,7 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Data.Entities.ProjectEntity", b =>
                 {
-                    b.HasOne("Data.Entities.CustomerEntity", "Customer")
+                    b.HasOne("Data.Entities.CustomersEntity", "Customer")
                         .WithMany("Projects")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -353,7 +331,7 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Data.Entities.ServiceEntity", "Service")
-                        .WithMany()
+                        .WithMany("Projects")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -373,7 +351,7 @@ namespace Data.Migrations
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("Data.Entities.CustomerEntity", b =>
+            modelBuilder.Entity("Data.Entities.CustomersEntity", b =>
                 {
                     b.Navigation("Projects");
                 });
@@ -381,6 +359,11 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Entities.RolesEntity", b =>
                 {
                     b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("Data.Entities.ServiceEntity", b =>
+                {
+                    b.Navigation("Projects");
                 });
 
             modelBuilder.Entity("Data.Entities.StatusEntity", b =>

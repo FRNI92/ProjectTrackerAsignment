@@ -9,7 +9,7 @@ public static class CustomerFactory
 /// </summary>
 /// <param name="entity"></param>
 /// <returns></returns>
-    public static CustomerDto ToDto(CustomerEntity entity)
+    public static CustomerDto ToDto(CustomersEntity entity)
     {
         return new CustomerDto
         {
@@ -24,9 +24,9 @@ public static class CustomerFactory
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
-    public static CustomerEntity ToEntity(CustomerDto dto)
+    public static CustomersEntity ToEntity(CustomerDto dto)
     {
-        return new CustomerEntity
+        return new CustomersEntity
         {
             Id = dto.Id,
             Name = dto.Name,

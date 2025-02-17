@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddedRoles : Migration
+    public partial class Changedbacktostartingsetup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -99,10 +99,13 @@ namespace Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ProjectNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Duration = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     ServiceId = table.Column<int>(type: "int", nullable: false),
@@ -138,13 +141,56 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "Id", "Email", "Name", "PhoneNumber" },
+                values: new object[,]
+                {
+                    { 1, "contact@companyA.com", "Company A", "123456789" },
+                    { 2, "contact@companyB.com", "Company B", "987654321" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "Description", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Full access", "Admin" },
-                    { 2, "Limited access", "User" }
+                    { 1, "Administrator role with full permissions", "Admin" },
+                    { 2, "Regular user role with limited permissions", "User" },
+                    { 3, "Role for project managers", "Manager" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Services",
+                columns: new[] { "Id", "Description", "Duration", "Name", "Price" },
+                values: new object[,]
+                {
+                    { 1, "Advice and feedback", 10m, "Consulting", 1000m },
+                    { 2, "Hardware and software", 1m, "IT-Support", 500m }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Statuses",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Ej påbörjat" },
+                    { 2, "Pågående" },
+                    { 3, "Avslutat" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Employees",
+                columns: new[] { "Id", "Email", "FirstName", "LastName", "RoleId" },
+                values: new object[,]
+                {
+                    { 1, "Fredrik@domain.com", "Fredrik", "Nilsson", 1 },
+                    { 2, "Hans@domain.com", "Hans", "Andersson", 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Projects",
+                columns: new[] { "Id", "CustomerId", "Description", "Duration", "EmployeeId", "EndDate", "Name", "ProjectNumber", "ServiceId", "StartDate", "StatusId", "TotalPrice" },
+                values: new object[] { 1, 1, "Första projektet", 10m, 1, new DateTime(2024, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Projekt A", "P-101", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 0m });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_RoleId",

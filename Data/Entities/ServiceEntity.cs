@@ -14,4 +14,7 @@ public class ServiceEntity
     public decimal Duration { get; set; } // Antal timmar för tjänsten
 
     public decimal Price { get; set; } // Pris på tjänsten
+
+
+    public ICollection<ProjectEntity> Projects { get; set; } = [];
 }

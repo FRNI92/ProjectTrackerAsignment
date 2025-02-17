@@ -1,8 +1,12 @@
-﻿namespace Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Data.Entities;
 
 public class StatusEntity
 {
+    [Key]
     public int Id { get; set; } // Primärnyckel
+    [Required]
     public string Name { get; set; } = null!; // Namn för status (t.ex. "Avslutat")
 
     /// <summary>
