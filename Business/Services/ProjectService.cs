@@ -2,10 +2,9 @@
 using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
-using Data.Contexts;
-using Data.Entities;
-using Data.Interfaces;
-using Data.Repositories;
+
+using Data_Infrastructure.Interfaces;
+using Data_Infrastructure.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;

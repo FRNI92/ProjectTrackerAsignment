@@ -1,5 +1,5 @@
 ﻿using Business.Dtos;
-using Data.Entities;
+using Data_Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Identity.Client;
 namespace Business.Factories;

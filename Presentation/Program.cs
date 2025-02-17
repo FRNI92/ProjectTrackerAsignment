@@ -1,8 +1,8 @@
 ﻿using Business.Interfaces;
 using Business.Services;
-using Data.Contexts;
-using Data.Interfaces;
-using Data.Repositories;
+using Data_Infrastructure.Contexts;
+using Data_Infrastructure.Interfaces;
+using Data_Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

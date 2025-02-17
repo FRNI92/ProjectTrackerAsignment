@@ -1,5 +1,5 @@
 ﻿using Business.Dtos;
-using Data.Entities;
+using Data_Infrastructure.Entities;
 using System.Net.NetworkInformation;
 
 namespace Business.Factories;

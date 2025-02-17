@@ -1,5 +1,5 @@
 ﻿using Business.Dtos;
-using Data.Entities;
+using Data_Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
 using System.Collections.Generic;

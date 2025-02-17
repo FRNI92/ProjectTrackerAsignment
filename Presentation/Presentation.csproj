@@ -20,12 +20,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameWorkCore.sqlServer" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameWorkCore.sqlServer" Version="9.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Business\Business.csproj" />
-    <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Data_Infrastructure\Data_Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
