@@ -232,9 +232,8 @@ public class ProjectRepository_Tests : Test_Base
             Name = "testname"
         };
 
-        
         //act
-        var isExisting = await _projectRepository.DoesEntityExistAsync(p => p.ProjectNumber == existingTest.ProjectNumber);
+        var isExisting = await _projectRepository.DoesEntityExistAsync(p => p.ProjectNumber == newTest.ProjectNumber);
 
         //assert
         Assert.True(isExisting);
