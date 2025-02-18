@@ -4,5 +4,5 @@ namespace Data_Infrastructure.Interfaces;
 
 public interface IProjectRepository : IBaseRepository<ProjectEntity>
 {
-    Task<ServiceEntity?> GetServiceByIdAsync(int serviceId);
+    //Task<ServiceEntity?> GetServiceByIdAsync(int serviceId);
 }

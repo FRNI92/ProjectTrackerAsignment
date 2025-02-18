@@ -15,10 +15,12 @@ namespace Business.Services;
 public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly IServiceService _serviceService;
 
-    public ProjectService(IProjectRepository projectRepository)
+    public ProjectService(IProjectRepository projectRepository, IServiceService serviceService)
     {
         _projectRepository = projectRepository;
+        _serviceService = serviceService;
     }
 
     public async Task<IResult> CreateProjectAsync(ProjectDto projectDto)
@@ -29,12 +31,15 @@ public class ProjectService : IProjectService
         await _projectRepository.BeginTransactionAsync();
         try
         {
-            var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
-            if (selectedService == null)
+            var serviceResult = await _serviceService.ReadServiceByIdAsync(projectDto.ServiceId);
+            if (serviceResult is not Result<ServiceDto> successResult)
             {
                 await _projectRepository.RollBackTransactionAsync();
                 return Result.NotFound("Could not find a service with that service ID");
             }
+
+            var selectedService = successResult.Data; // Extrahera den faktiska ServiceDto
+
             // Beräkna totalpris baserat på tjänstens pris och användarens valda duration
             var totalPrice = selectedService.Price * projectDto.Duration;
 
@@ -46,7 +51,7 @@ public class ProjectService : IProjectService
             if (!result)
             {
                 await _projectRepository.RollBackTransactionAsync();
-                return Result.Error("Unable To Create Project");
+                return Result.Error("Unable to create project");
             }
 
             var saveResult = await _projectRepository.SaveAsync();
@@ -108,25 +113,29 @@ public class ProjectService : IProjectService
             //Hämta den nya tjänsten om ServiceId ändrats
             if (projectDto.ServiceId != fetcheduneditedProject.ServiceId)
             {
-                var selectedService = await _projectRepository.GetServiceByIdAsync(projectDto.ServiceId);
-                if (selectedService == null)
+                var serviceResult = await _serviceService.ReadServiceByIdAsync(projectDto.ServiceId);
+                if (serviceResult is Result<ServiceDto> successResult)
+                {
+                    var selectedService = successResult.Data; // Extrahera ServiceDto
+                    fetcheduneditedProject.ServiceId = projectDto.ServiceId;
+                    fetcheduneditedProject.TotalPrice = selectedService.Price * fetcheduneditedProject.Duration;
+                }
+                else
                 {
                     await _projectRepository.RollBackTransactionAsync();
-                    return Result.NotFound("cant find service with that ID");
+                    return Result.NotFound("Can't find service with that ID");
                 }
-
-                //Uppdatera tjänsten och priset
-                fetcheduneditedProject.ServiceId = projectDto.ServiceId;
-                fetcheduneditedProject.TotalPrice = selectedService.Price * fetcheduneditedProject.Duration;
             }
 
-            //Uppdatera durationen och räkna om priset om den ändrats
+            // Uppdatera durationen och räkna om priset om den ändrats
             if (projectDto.Duration != 0 && projectDto.Duration != fetcheduneditedProject.Duration)
             {
                 fetcheduneditedProject.Duration = projectDto.Duration;
-                var service = await _projectRepository.GetServiceByIdAsync(fetcheduneditedProject.ServiceId);
-                if (service != null)
+
+                var serviceResult = await _serviceService.ReadServiceByIdAsync(fetcheduneditedProject.ServiceId);
+                if (serviceResult is Result<ServiceDto> successResult)
                 {
+                    var service = successResult.Data;
                     fetcheduneditedProject.TotalPrice = service.Price * fetcheduneditedProject.Duration;
                 }
             }

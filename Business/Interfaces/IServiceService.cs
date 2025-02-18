@@ -7,6 +7,8 @@ namespace Business.Interfaces
         Task<IResult> CreateServiceAsync(ServiceDto serviceDto);
         Task<IResult> DeleteServiceEntity(int id);
         Task<IResult> ReadServiceAsync();
+
+        Task<IResult> ReadServiceByIdAsync(int serviceId);
         Task<IResult> UpdateServiceAsync(ServiceDto serviceDto);
     }
 }

@@ -72,6 +72,25 @@ public class ServiceService : IServiceService
     }
 
 
+    public async Task<IResult> ReadServiceByIdAsync(int serviceId)
+    {
+        try
+        {
+            var service = await _serviceRepository.GetAsync(s => s.Id == serviceId);
+            if (service == null)
+                return Result.NotFound("Service not found");
+
+            var serviceDto = ServiceFactory.ToDto(service);
+            return Result<ServiceDto>.OK(serviceDto);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"An error occurred when reading service: {ex.Message}{ex.StackTrace}");
+            return Result.Error("There was an error when reading the service");
+        }
+    }
+
+
     public async Task<IResult> UpdateServiceAsync(ServiceDto serviceDto)
     {
         if (serviceDto == null)

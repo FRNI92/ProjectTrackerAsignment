@@ -12,5 +12,7 @@ public class ServiceRepository : BaseRepository<ServiceEntity>, IServiceReposito
     {
         _context = context;
     }
+
+
 }
 

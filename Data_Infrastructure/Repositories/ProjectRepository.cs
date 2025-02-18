@@ -26,10 +26,10 @@ public class ProjectRepository : BaseRepository<ProjectEntity>, IProjectReposito
  
     }
 
-    public async Task<ServiceEntity?> GetServiceByIdAsync(int serviceId)
-    {
-        return await _context.Services.FirstOrDefaultAsync(s => s.Id == serviceId);
-    }
+    //public async Task<ServiceEntity?> GetServiceByIdAsync(int serviceId) ska flyttas råkade lägga fel. kan nog använda base
+    //{
+    //    return await _context.Services.FirstOrDefaultAsync(s => s.Id == serviceId);
+    //}
 
 }
 

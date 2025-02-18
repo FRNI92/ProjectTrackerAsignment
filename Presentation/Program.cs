@@ -59,7 +59,7 @@ serviceCollection.AddScoped<IStatusService, StatusService>();
 serviceCollection.AddScoped<IServiceRepository, ServiceRepository>();
 serviceCollection.AddScoped<IServiceService, ServiceService>();
 
-// Registrera dina meny-dialoger
+// menydialoger
 serviceCollection.AddScoped<IProjectMenuDialogs, ProjectMenuDialogs>();
 serviceCollection.AddScoped<ICustomerMenuDialogs, CustomerMenuDialogs>();
 serviceCollection.AddScoped<IEmployeeMenuDialogs, EmployeeMenuDialogs>();
