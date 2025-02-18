@@ -244,6 +244,17 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                         RoleId = newRoleId
                     };
 
+                    Console.WriteLine("\nDo you want to save changes?");
+                    Console.Write("Type 'yes' to save, or anything else to cancel: ");
+                    var confirmSave = Console.ReadLine();
+
+                    if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                    {
+                        Console.WriteLine("\nEdit cancelled. Returning to menu...");
+                        Console.ReadKey();
+                        return;
+                    }
+
                     await _employeeService.UpdateEmployeeAsync(updatedEmployee.Id, updatedEmployee);
                     Console.WriteLine("\nemployee updated successfully!");
                     Console.WriteLine("\nPress any key to return to the menu...");

@@ -92,6 +92,7 @@ public class CustomerService : ICustomerService
             customer.PhoneNumber = string.IsNullOrWhiteSpace(customerDto.PhoneNumber) ? customer.PhoneNumber : customerDto.PhoneNumber;
 
             // Uppdatera i databasen
+
             var updatedCustomer = await _customerRepository.TransactionUpdateAsync(x => x.Id == customer.Id, customer);
             if (updatedCustomer == null)
             {

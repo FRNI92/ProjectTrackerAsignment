@@ -5,6 +5,7 @@ using Data_Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Xunit.Sdk;
 
 namespace Tests.Repositories;
 
@@ -59,6 +60,7 @@ public class ProjectRepository_Tests : Test_Base
         var status = new StatusEntity { Id = 1, Name = "Active" };
         var employee = new EmployeesEntity { 
             Id = 1, 
+            RoleId = 1,
             FirstName = "John Doe", 
             LastName = "Nilsson", 
             Email = "Fredrik@domain.com" };
@@ -111,4 +113,145 @@ public class ProjectRepository_Tests : Test_Base
         Assert.Equal("Consulting", fetchedProject.Service.Name);
     }
 
+    [Fact]
+    public async Task GetAsync_ShouldReturnCorrectEntity()
+    {
+        // ARRANGE – Lägg till två entiteter
+        var project1 = new ProjectEntity { Id = 1, ProjectNumber = "P-101", Name = "Project One" };
+        var project2 = new ProjectEntity { Id = 2, ProjectNumber = "P-102", Name = "Project Two" };
+
+        _context.Projects.Add(project1);
+        _context.Projects.Add(project2);
+        await _context.SaveChangesAsync(); // Viktigt för att datan ska finnas i testdatabasen
+
+        // ACT – Hämta en specifik entitet
+        var result = await _projectRepository.GetAsync(p => p.Id == 2); // Hämta `project2`
+
+        // ASSERT – Kontrollera att rätt entitet hämtades
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Id);
+        Assert.Equal("P-102", result.ProjectNumber);
+        Assert.Equal("Project Two", result.Name);
+    }
+
+
+    [Fact]
+    public async Task SaveAsync_ShouldSaveAndReturnInt()
+    {
+        //arrange
+        var project1 = new ProjectEntity { 
+            Id = 1, 
+            ProjectNumber = "TestNumber", 
+            Name = "Test1" };
+
+        await _projectRepository.AddAsync(project1);
+        var saveResult = await _projectRepository.SaveAsync();
+
+        //act
+        var savedProject = await _projectRepository.GetAsync(p => p.Id == 1);
+
+        //Assert
+        Assert.NotNull(savedProject);
+        Assert.Equal(1, saveResult); // SaveAsync ska returnera 1 vid en lyckad ändring
+        Assert.Equal(project1.Id, savedProject.Id);
+        Assert.Equal("TestNumber", savedProject.ProjectNumber);
+        Assert.Equal("Test1", savedProject.Name);
+    }
+
+    [Fact] 
+    public async Task RemoveAsync_ShouldRemoveAndReturnBool()
+    {
+        //arrange
+        var testProject = new ProjectEntity
+        {
+            Id = 1,
+            ProjectNumber = "test1",
+            Name = "testproject"
+        };
+        await _projectRepository.AddAsync(testProject);
+        await _projectRepository.SaveAsync();
+
+        //act
+        var loadedEntity = await _projectRepository.GetAsync(p => p.Id == testProject.Id);
+        var result = await _projectRepository.RemoveAsync(p => p.Id == testProject.Id);
+        await _projectRepository.SaveAsync(); // Spara ändringen i databasen
+
+        // ASSERT – Kontrollera att projektet har raderats
+        var deletedEntity = await _projectRepository.GetAsync(p => p.Id == testProject.Id);
+        Assert.True(result);
+        Assert.Null(deletedEntity);
+    }
+
+
+    [Fact]
+    public async Task TransactionUpdateAsync_ShouldUpdateEntity_AndReturnEntity()
+    {
+        //arrange
+        var notUpdatedProject = new ProjectEntity
+        {
+            Id = 1,
+            ProjectNumber = "Test1",
+            Name = "TestProject"
+        };
+        await _projectRepository.AddAsync(notUpdatedProject);
+        await _projectRepository.SaveAsync();
+
+        //act 
+        var newDataProject = new ProjectEntity
+        {
+            Id = notUpdatedProject.Id,
+            ProjectNumber = notUpdatedProject.ProjectNumber,
+            Name = "UpdatedTestProject"
+        };
+
+        var result = await _projectRepository.TransactionUpdateAsync(p => p.Id == notUpdatedProject.Id, newDataProject);
+
+        //assert
+        Assert.NotNull(result);
+        Assert.Equal("UpdatedTestProject", result.Name);
+        Assert.Equal(notUpdatedProject.Name, result.Name);
+    }
+
+    [Fact]
+    public async Task DoesEntityExistAsync_ShouldReturnBool()
+    {
+        //arrange
+        var existingTest = new ProjectEntity
+        {
+            Id = 1,
+            ProjectNumber = "testnumber",
+            Name = "testname"
+        };
+        await _projectRepository.AddAsync(existingTest);
+        await _projectRepository.SaveAsync();
+
+        var newTest = new ProjectEntity
+        {
+            Id = 2,
+            ProjectNumber = "testnumber",
+            Name = "testname"
+        };
+
+        
+        //act
+        var isExisting = await _projectRepository.DoesEntityExistAsync(p => p.ProjectNumber == existingTest.ProjectNumber);
+
+        //assert
+        Assert.True(isExisting);
+
+    }
+
+
+
+
+
+    //Task<bool> DoesEntityExistAsync(Expression<Func<TEntity, bool>> expression);
+
+    //Task<TEntity> TransactionUpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity);
+    //Task<bool> RemoveAsync(Expression<Func<TEntity, bool>> expression); test is done
+
+    //Task<int> SaveAsync(); test is done
+    //Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression); test is done
+    //Task<bool> AddAsync(TEntity entity); test is done
+    //Task<IEnumerable<TEntity>> GetAllAsync(); test is done
 }

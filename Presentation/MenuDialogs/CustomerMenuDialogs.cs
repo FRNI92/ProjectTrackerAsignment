@@ -155,6 +155,18 @@ public class CustomerMenuDialogs : ICustomerMenuDialogs
                     Email = string.IsNullOrWhiteSpace(newEmail) ? selectedCustomer.Email : newEmail,
                     PhoneNumber = string.IsNullOrWhiteSpace(newPhonenumber) ? selectedCustomer.PhoneNumber : newPhonenumber
                 };
+
+                Console.WriteLine("\nDo you want to save changes?");
+                Console.Write("Type 'yes' to save, or anything else to cancel: ");
+                var confirmSave = Console.ReadLine();
+
+                if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                {
+                    Console.WriteLine("\nEdit cancelled. Returning to menu...");
+                    Console.ReadKey();
+                    return;
+                }
+
                 var result = await _customerService.UpdateCustomerAsync(updatedCustomer);
                 if (result is Result<CustomerDto> updateResult && updateResult.Success)
                 {

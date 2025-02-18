@@ -147,6 +147,18 @@ public class RoleMenuDialog : IRoleMenuDialog
                     Name = string.IsNullOrWhiteSpace(newName) ? selectedRole.Name : newName,//tom eller null behåll gamla : annar newName
                     Description = string.IsNullOrWhiteSpace(newDescription) ? selectedRole.Description : newDescription,
                 };
+
+                Console.WriteLine("\nDo you want to save changes?");
+                Console.Write("Type 'yes' to save, or anything else to cancel: ");
+                var confirmSave = Console.ReadLine();
+
+                if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                {
+                    Console.WriteLine("\nEdit cancelled. Returning to menu...");
+                    Console.ReadKey();
+                    return;
+                }
+
                 var result = await _roleService.UpdateRolesAsync(updatedRole);
                 if (result is Result<RolesDto> updateResult && updateResult.Success)
                 {

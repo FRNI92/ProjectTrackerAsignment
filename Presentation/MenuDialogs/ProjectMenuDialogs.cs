@@ -370,8 +370,14 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
             {
                 var selectedProject = projectsData.ElementAt(choice - 1); //hämta vald kund
 
-                Console.Write($"Enter new name (leave blank to keep current:({selectedProject.Name}): ");
+                Console.Write("Enter new name (leave blank to keep current or type 'exit' to cancel): ");
                 var newName = Console.ReadLine();
+                if (newName?.ToLower() == "exit")
+                {
+                    Console.WriteLine("\nEdit cancelled. Returning to menu...");
+                    Console.ReadKey();
+                    return;
+                }
 
                 Console.Write($"Enter new Description (leave blank to keep current:({selectedProject.Description}): ");
                 var newDescription = Console.ReadLine();
@@ -560,6 +566,16 @@ public class ProjectMenuDialogs : IProjectMenuDialogs
                     EmployeeId = selectedEmployeeId
                 };
 
+                Console.WriteLine("\nDo you want to save changes?");
+                Console.Write("Type 'yes' to save, or anything else to cancel: ");
+                var confirmSave = Console.ReadLine();
+
+                if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                {
+                    Console.WriteLine("\nEdit cancelled. Returning to menu...");
+                    Console.ReadKey();
+                    return;
+                }
                 // Uppdatera kunden
                 await _projectService.UpdateProjectAsync(updatedProject);
                 Console.WriteLine("\nProject updated successfully!");
