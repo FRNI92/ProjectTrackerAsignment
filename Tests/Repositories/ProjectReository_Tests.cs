@@ -244,7 +244,7 @@ public class ProjectRepository_Tests : Test_Base
 
 
 
-    //Task<bool> DoesEntityExistAsync(Expression<Func<TEntity, bool>> expression);
+    //Task<bool> DoesEntityExistAsync(Expression<Func<TEntity, bool>> expression); test is done
 
     //Task<TEntity> TransactionUpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity);
     //Task<bool> RemoveAsync(Expression<Func<TEntity, bool>> expression); test is done
