@@ -139,6 +139,42 @@ public class StatusService_Tests
         }
     }
 
+    [Fact]
+    public async Task DeleteStatusAsync_ShouldRemoveStatus_AndReturnId()
+    {
+        //arrange
+        var statusEntity = new StatusEntity
+        {
+            Id = 1,
+            Name = "EXISTS"
+        };
+        var statusDto = new StatusDto
+        {
+            Id = 1,
+            Name = "EXISTS"
+        };
+
+        _statusRepositoryMock
+            .Setup(repo => repo
+            .DoesEntityExistAsync(It.IsAny<Expression<Func<StatusEntity, bool>>>()))
+            .ReturnsAsync(true);
+
+        _statusRepositoryMock
+            .Setup(repo => repo.RemoveAsync(It.IsAny<Expression<Func<StatusEntity, bool>>>()))
+            .ReturnsAsync(true);
+        _statusRepositoryMock
+            .Setup(repo => repo.SaveAsync())
+            .ReturnsAsync(1);
+        //act
+        var result = await _statusService.DeleteStatusAsync(statusDto.Id);
+        //assert does remove save
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IResult>(result);
+        _statusRepositoryMock.Verify(repo => repo.DoesEntityExistAsync(It.IsAny<Expression<Func<StatusEntity, bool>>>()), Times.Once);
+        _statusRepositoryMock.Verify(repo => repo.RemoveAsync(It.IsAny<Expression<Func<StatusEntity, bool>>>()), Times.Once);
+        _statusRepositoryMock.Verify(repo => repo.SaveAsync(), Times.Once);
+    }
+
 }
 
 
