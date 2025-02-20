@@ -103,7 +103,7 @@ public class RoleService(IRolesRepository rolesRepository) : IRoleService
             if (saveResult > 0)
             {
                 await _rolesRepository.CommitTransactionAsync();
-                return Result<RolesDto>.OK(RoleFactory.ToDto(existingRole));
+                return Result<RolesDto>.OK(RoleFactory.ToDto(result));
             }
 
             await _rolesRepository.RollBackTransactionAsync();
