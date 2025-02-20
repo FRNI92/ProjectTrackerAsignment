@@ -4,16 +4,15 @@ namespace Data_Infrastructure.Entities;
 public class ServiceEntity
 {
     [Key]
-    public int Id { get; set; } // Primärnyckel
-
+    public int Id { get; set; } 
     [Required]
-    public string Name { get; set; } = null!; // Namn på tjänsten
+    public string Name { get; set; } = null!; 
 
-    public string? Description { get; set; } // Beskrivning av tjänsten
+    public string? Description { get; set; } 
 
-    public decimal Duration { get; set; } // Antal timmar för tjänsten
+    public decimal Duration { get; set; } 
 
-    public decimal Price { get; set; } // Pris på tjänsten
+    public decimal Price { get; set; } 
 
 
     public ICollection<ProjectEntity> Projects { get; set; } = [];

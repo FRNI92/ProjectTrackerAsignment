@@ -151,7 +151,7 @@ public class ServiceMenuDialogs : IServiceMenuDialogs
 
             if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= servicesData.Count())
             {
-                var selectedService = servicesData.ElementAt(choice - 1); //hämta vald kund
+                var selectedService = servicesData.ElementAt(choice - 1); 
 
                 Console.WriteLine($"Enter new service name (leave blank to keep current: {selectedService.Name}):");
                 var newServiceName = Console.ReadLine();
@@ -160,14 +160,14 @@ public class ServiceMenuDialogs : IServiceMenuDialogs
                 var updatedService = new ServiceDto()
                 {
                     Id = selectedService.Id,
-                    Name = string.IsNullOrWhiteSpace(newServiceName) ? selectedService.Name : newServiceName//tom eller null behåll gamla : annar newName
+                    Name = string.IsNullOrWhiteSpace(newServiceName) ? selectedService.Name : newServiceName
                 };
 
                 Console.WriteLine("\nDo you want to save changes?");
                 Console.Write("Type 'yes' to save, or anything else to cancel: ");
                 var confirmSave = Console.ReadLine();
 
-                if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                if (confirmSave?.ToLower() != "yes")
                 {
                     Console.WriteLine("\nEdit cancelled. Returning to menu...");
                     Console.ReadKey();
@@ -175,7 +175,7 @@ public class ServiceMenuDialogs : IServiceMenuDialogs
                 }
 
                 var result = await _serviceService.UpdateServiceAsync(updatedService);
-                if (result.Success)  // Kontrollera om resultatet var framgångsrikt
+                if (result.Success) 
                 {
                     Console.WriteLine("Status updated successfully!");
                 }

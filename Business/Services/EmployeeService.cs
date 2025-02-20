@@ -48,10 +48,8 @@ public class EmployeeService : IEmployeeService
             {
                 await _employeeRepository.CommitTransactionAsync();
 
-                // 🔹 Hämta den sparade anställda från databasen
                 var savedEmployee = await _employeeRepository.GetAsync(e => e.Id == newEmployeeEntity.Id);
 
-                // 🔹 Konvertera till DTO och returnera det
                 var employeeDtoWithRole = EmployeeFactory.ToDto(savedEmployee);
                 return Result<EmployeeDto>.OK(employeeDtoWithRole);
             }
@@ -132,10 +130,9 @@ public class EmployeeService : IEmployeeService
                 return Result.NotFound("Employee not found for update.");
             }
 
-            // Skapa en ny entitet från DTO och ersätt den gamla
             var updatedEntity = EmployeeFactory.ToEntity(updatedEmployeeDto);
 
-            // Uppdatera direkt i databasen
+
             var updatedEmployee = await _employeeRepository.TransactionUpdateAsync(e => e.Id == id, updatedEntity);
             if (updatedEmployee == null)
             {
@@ -143,7 +140,7 @@ public class EmployeeService : IEmployeeService
                 return Result.Error("Failed to update employee.");
             }
 
-            // Spara ändringarna
+
             var isUpdatedAndSaved = await _employeeRepository.SaveAsync();
             if (isUpdatedAndSaved > 0)
             {

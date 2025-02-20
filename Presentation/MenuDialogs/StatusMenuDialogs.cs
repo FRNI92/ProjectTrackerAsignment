@@ -124,7 +124,7 @@ public class StatusMenuDialogs : IStatusMenuDialogs
 
             if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= statusesData.Count())
             {
-                var selectedStatus = statusesData.ElementAt(choice - 1); //hämta vald kund
+                var selectedStatus = statusesData.ElementAt(choice - 1); 
 
                 Console.WriteLine($"Enter new status name (leave blank to keep current: {selectedStatus.Name}):");
                 var newStatusName = Console.ReadLine();
@@ -133,7 +133,7 @@ public class StatusMenuDialogs : IStatusMenuDialogs
                 var updatedStatus = new StatusDto()
                 {
                     Id = selectedStatus.Id,
-                    Name = string.IsNullOrWhiteSpace(newStatusName) ? selectedStatus.Name : newStatusName//tom eller null behåll gamla : annar newName
+                    Name = string.IsNullOrWhiteSpace(newStatusName) ? selectedStatus.Name : newStatusName
 
                 };
 
@@ -141,7 +141,7 @@ public class StatusMenuDialogs : IStatusMenuDialogs
                 Console.Write("Type 'yes' to save, or anything else to cancel: ");
                 var confirmSave = Console.ReadLine();
 
-                if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                if (confirmSave?.ToLower() != "yes")
                 {
                     Console.WriteLine("\nEdit cancelled. Returning to menu...");
                     Console.ReadKey();
@@ -149,7 +149,7 @@ public class StatusMenuDialogs : IStatusMenuDialogs
                 }
 
                 var result = await _statusservice.UpdateStatusAsync(updatedStatus);
-                if (result.Success)  // Kontrollera om resultatet var framgångsrikt
+                if (result.Success) 
                 {
                     Console.WriteLine("Status updated successfully!");
                 }
@@ -187,7 +187,6 @@ public class StatusMenuDialogs : IStatusMenuDialogs
             return;
         }
 
-        // Visa alla kunder
         int index = 1;
         foreach (var status in statuses)
         {

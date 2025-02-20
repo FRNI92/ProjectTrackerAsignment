@@ -58,7 +58,7 @@ public class CustomerService : ICustomerService
             var customers = await _customerRepository.GetAllAsync();
             if (customers != null && customers.Any())
             {
-                var customerDtoList = customers.Select(customer => CustomerFactory.ToDto(customer)).ToList(); // Använd ToList() här
+                var customerDtoList = customers.Select(customer => CustomerFactory.ToDto(customer)).ToList();
                 return Result<IEnumerable<CustomerDto>>.OK(customerDtoList);
             }
             else
@@ -91,8 +91,8 @@ public class CustomerService : ICustomerService
             customer.Email = string.IsNullOrWhiteSpace(customerDto.Email) ? customer.Email : customerDto.Email;
             customer.PhoneNumber = string.IsNullOrWhiteSpace(customerDto.PhoneNumber) ? customer.PhoneNumber : customerDto.PhoneNumber;
 
-            // Uppdatera i databasen
 
+            // uppdatera i databasen
             var updatedCustomer = await _customerRepository.TransactionUpdateAsync(x => x.Id == customer.Id, customer);
             if (updatedCustomer == null)
             {
@@ -101,7 +101,7 @@ public class CustomerService : ICustomerService
             }
             
 
-            // Returnera den uppdaterade kunden som DTO
+       
             var isSavedCustomer = await _customerRepository.SaveAsync();
             if (isSavedCustomer > 0)
             {

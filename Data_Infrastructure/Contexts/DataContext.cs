@@ -63,7 +63,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 ServiceId = 1,  // Consulting
                 EmployeeId = 1,  // Fredrik Nilsson
                 Duration = 10,
-                //TotalPrice = 5000 räknas ut av servicen endå
+                //TotalPrice = 5000 gets calculated by service
             }
         );
     }

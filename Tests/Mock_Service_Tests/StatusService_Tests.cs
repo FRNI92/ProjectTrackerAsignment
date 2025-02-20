@@ -18,7 +18,7 @@ public class StatusService_Tests
     public StatusService_Tests()
     {
         _statusRepositoryMock = new Mock <IStatusRepository>();
-        _statusService = new StatusService(_statusRepositoryMock.Object);// Cant instansiate Interfaces
+        _statusService = new StatusService(_statusRepositoryMock.Object);// Cant instansiate Interfaces, needs real service
     }
 
     [Fact]
@@ -69,13 +69,13 @@ public class StatusService_Tests
         var result = await _statusService.ReadStatusAsync();
         //assert
         Assert.NotNull(result);
-        Assert.IsAssignableFrom<IResult>(result); // Kontrollera att vi får tillbaka IResult
+        Assert.IsAssignableFrom<IResult>(result);
 
         if (result is Result<IEnumerable<StatusDto>> successResult)
         {
             var data = successResult.Data.ToList();
 
-            Assert.Equal(2, data.Count); // Kontrollera att vi fick tillbaka 2 statusar
+            Assert.Equal(2, data.Count); 
             Assert.Equal("Active", data[0].Name);
             Assert.Equal("SuperActive", data[1].Name);
         }
@@ -118,6 +118,7 @@ public class StatusService_Tests
         _statusRepositoryMock
             .Setup(repo => repo.SaveAsync())
             .ReturnsAsync(1);
+        
         //act
         var result = await _statusService.UpdateStatusAsync(newDto);
         //assert
@@ -131,7 +132,7 @@ public class StatusService_Tests
         if (result is Result<StatusDto> successResult)
         {
             Assert.NotNull(successResult.Data);
-            Assert.Equal("NEW", successResult.Data.Name); // Kontrollera att namnet ändrades
+            Assert.Equal("NEW", successResult.Data.Name); 
         }
         else
         {
@@ -165,6 +166,7 @@ public class StatusService_Tests
         _statusRepositoryMock
             .Setup(repo => repo.SaveAsync())
             .ReturnsAsync(1);
+        
         //act
         var result = await _statusService.DeleteStatusAsync(statusDto.Id);
         //assert does remove save

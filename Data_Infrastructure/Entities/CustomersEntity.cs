@@ -5,10 +5,9 @@ namespace Data_Infrastructure.Entities;
 public class CustomersEntity
 {
     [Key]
-    public int Id { get; set; } // Primärnyckel
-
+    public int Id { get; set; } 
     [Required]
-    [MaxLength(100)] // Begränsar längden till 100 tecken
+    [MaxLength(100)] 
     public string Name { get; set; } = null!;
 
     [Required]
@@ -16,7 +15,7 @@ public class CustomersEntity
     public string Email { get; set; } = null!;
 
     [Required]
-    [MaxLength(15)] // Begränsar telefonnumret till 15 tecken
+    [MaxLength(15)] 
     public string PhoneNumber { get; set; } = null!;
 
     public ICollection<ProjectEntity> Projects { get; set; } = new List<ProjectEntity>();

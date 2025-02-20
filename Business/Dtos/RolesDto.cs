@@ -5,11 +5,11 @@ namespace Business.Dtos;
 public class RolesDto
 {
     [Key]
-    public int Id { get; set; } // Primärnyckel
+    public int Id { get; set; }
 
     [Required]
-    public string Name { get; set; } = null!; // Rollens namn, t.ex. "Admin", "User"
+    public string Name { get; set; } = null!;
 
-    public string? Description { get; set; } // Beskrivning av rollen (valfritt)
+    public string? Description { get; set; }
 
 }

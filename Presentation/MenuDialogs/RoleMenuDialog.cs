@@ -105,7 +105,6 @@ public class RoleMenuDialog : IRoleMenuDialog
         Console.Clear();
         Console.WriteLine("This Is The Role-List:");
 
-        // Hämta alla kunder
         var roles = await _roleService.GetAllRolesAsync();
 
         if (roles is Result<IEnumerable<RolesDto>> rolesResult && roles.Success)
@@ -133,7 +132,7 @@ public class RoleMenuDialog : IRoleMenuDialog
 
             if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= rolesData.Count())
             {
-                var selectedRole = rolesData.ElementAt(choice - 1); //hämta vald kund
+                var selectedRole = rolesData.ElementAt(choice - 1);
 
                 Console.WriteLine($"Enter new name (leave blank to keep current: {selectedRole.Name}):");
                 var newName = Console.ReadLine();
@@ -144,7 +143,7 @@ public class RoleMenuDialog : IRoleMenuDialog
                 var updatedRole = new RolesDto()
                 {
                     Id = selectedRole.Id,
-                    Name = string.IsNullOrWhiteSpace(newName) ? selectedRole.Name : newName,//tom eller null behåll gamla : annar newName
+                    Name = string.IsNullOrWhiteSpace(newName) ? selectedRole.Name : newName,
                     Description = string.IsNullOrWhiteSpace(newDescription) ? selectedRole.Description : newDescription,
                 };
 
@@ -152,7 +151,7 @@ public class RoleMenuDialog : IRoleMenuDialog
                 Console.Write("Type 'yes' to save, or anything else to cancel: ");
                 var confirmSave = Console.ReadLine();
 
-                if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                if (confirmSave?.ToLower() != "yes")
                 {
                     Console.WriteLine("\nEdit cancelled. Returning to menu...");
                     Console.ReadKey();
@@ -198,7 +197,6 @@ public class RoleMenuDialog : IRoleMenuDialog
             return;
         }
 
-        // Visa alla kunder
         int index = 1;
         foreach (var role in roles)
         {
@@ -217,7 +215,6 @@ public class RoleMenuDialog : IRoleMenuDialog
 
         var selectedRole = roles.ElementAt(choice - 1);
 
-        // be om bekräftelse innan radering
         Console.WriteLine($"Are you sure you want to delete this Role: {selectedRole.Name}? (y/n)");
         if (Console.ReadLine()?.ToLower() != "y")
         {
@@ -227,7 +224,6 @@ public class RoleMenuDialog : IRoleMenuDialog
             return;
         }
 
-        // Försök att radera kunden
         try
         {
             await _roleService.DeleteRolesAsync(selectedRole);

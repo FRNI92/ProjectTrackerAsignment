@@ -12,12 +12,12 @@ public class ProjectDto
     [Required]
     public string Name { get; set; } = null!;
 
-    public string? Description { get; set; } // Beskrivning
+    public string? Description { get; set; } 
 
     [Required]
-    public DateTime StartDate { get; set; } // Startdatum
+    public DateTime StartDate { get; set; } 
 
-    public DateTime? EndDate { get; set; } // Slutdatum
+    public DateTime? EndDate { get; set; } 
 
     public decimal TotalPrice { get; set; }
     public decimal Duration { get; set; }

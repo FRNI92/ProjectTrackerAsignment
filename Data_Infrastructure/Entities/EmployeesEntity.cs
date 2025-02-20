@@ -7,16 +7,16 @@ namespace Data_Infrastructure.Entities;
 public class EmployeesEntity
 {
     [Key]
-    public int Id { get; set; } // Primärnyckel
+    public int Id { get; set; } 
 
     [Required]
-    public string FirstName { get; set; } = null!; // Förnamn
+    public string FirstName { get; set; } = null!; 
 
     [Required]
-    public string LastName { get; set; } = null!; // Efternamn
+    public string LastName { get; set; } = null!; 
 
-    public string Email { get; set; } = null!;//unique?
+    public string Email { get; set; } = null!;
 
-    public int RoleId { get; set; } // Foreign Key till RoleEntity [ForeignKey(nameof(RoleId))] EFC förstår men man kan förtydliga
-    public RolesEntity? Role { get; set; } // Navigation property
+    public int RoleId { get; set; } 
+    public RolesEntity? Role { get; set; } 
 }

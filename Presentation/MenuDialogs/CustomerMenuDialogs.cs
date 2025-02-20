@@ -107,7 +107,7 @@ public class CustomerMenuDialogs : ICustomerMenuDialogs
         Console.Clear();
         Console.WriteLine("This Is The Customer List:");
 
-        // Hämta alla kunder
+  
         var customers = await _customerService.GetAllCustomerAsync();
 
         if (customers is Result<IEnumerable<CustomerDto>> customersResult && customers.Success)
@@ -122,8 +122,6 @@ public class CustomerMenuDialogs : ICustomerMenuDialogs
                 return;
             }
 
-
-            // Visa alla kunder
             int index = 1;
             foreach (var customer in customersData)
             {
@@ -132,12 +130,12 @@ public class CustomerMenuDialogs : ICustomerMenuDialogs
                 index++;
             }
 
-            Console.WriteLine("----Which Customer Would You Like To Update? Enter the number:");
 
-            // Låt användaren välja en kund
+            Console.WriteLine("----Which Customer Would You Like To Update? Enter the number:");
+            
             if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= customersData.Count())
             {
-                var selectedCustomer = customersData.ElementAt(choice - 1); //hämta vald kund
+                var selectedCustomer = customersData.ElementAt(choice - 1);
 
                 Console.WriteLine($"Enter new name (leave blank to keep current: {selectedCustomer.Name}):");
                 var newName = Console.ReadLine();
@@ -151,7 +149,7 @@ public class CustomerMenuDialogs : ICustomerMenuDialogs
                 var updatedCustomer = new CustomerDto()
                 {
                     Id = selectedCustomer.Id,
-                    Name = string.IsNullOrWhiteSpace(newName) ? selectedCustomer.Name : newName,//tom eller null behåll gamla : annar newName
+                    Name = string.IsNullOrWhiteSpace(newName) ? selectedCustomer.Name : newName,
                     Email = string.IsNullOrWhiteSpace(newEmail) ? selectedCustomer.Email : newEmail,
                     PhoneNumber = string.IsNullOrWhiteSpace(newPhonenumber) ? selectedCustomer.PhoneNumber : newPhonenumber
                 };
@@ -160,7 +158,7 @@ public class CustomerMenuDialogs : ICustomerMenuDialogs
                 Console.Write("Type 'yes' to save, or anything else to cancel: ");
                 var confirmSave = Console.ReadLine();
 
-                if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                if (confirmSave?.ToLower() != "yes")
                 {
                     Console.WriteLine("\nEdit cancelled. Returning to menu...");
                     Console.ReadKey();
@@ -224,7 +222,6 @@ public class CustomerMenuDialogs : ICustomerMenuDialogs
 
         var selectedCustomer = customers.ElementAt(choice - 1);
 
-        // Be om bekräftelse innan radering
         Console.WriteLine($"Are you sure you want to delete this customer: {selectedCustomer.Name}? (y/n)");
         if (Console.ReadLine()?.ToLower() != "y")
         {
@@ -234,7 +231,6 @@ public class CustomerMenuDialogs : ICustomerMenuDialogs
             return;
         }
 
-        // Försök att radera kunden
         try
         {
             await _customerService.DeleteCustomerAsync(selectedCustomer);

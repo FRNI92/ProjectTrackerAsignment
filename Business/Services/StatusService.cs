@@ -14,7 +14,7 @@ public class StatusService(IStatusRepository statusRepository) : IStatusService
 {
     private readonly IStatusRepository _statusRepository = statusRepository;
 
-    //CREATE
+
     public async Task<IResult> CreateStatusAsync(StatusDto statusDto)
     {
         if (statusDto == null)
@@ -28,16 +28,16 @@ public class StatusService(IStatusRepository statusRepository) : IStatusService
         try
         {
             var newStatusEntity = StatusFactory.ToEntity(statusDto);
-            await _statusRepository.AddAsync(newStatusEntity); // Lägg till, men spara inte än
+            await _statusRepository.AddAsync(newStatusEntity); 
 
-            var saveResult = await _statusRepository.SaveAsync(); // Spara ändringarna
+            var saveResult = await _statusRepository.SaveAsync(); 
             if (saveResult > 0)
             {
                 await _statusRepository.CommitTransactionAsync();
                 return Result.OK();
             }
 
-            // Om SaveAsync misslyckas, rulla tillbaka
+            // if saveasync fails, role back
             await _statusRepository.RollBackTransactionAsync();
             return Result.Error("Could not create status correctly");
         }
@@ -82,7 +82,7 @@ public class StatusService(IStatusRepository statusRepository) : IStatusService
         await _statusRepository.BeginTransactionAsync();
         try
         {
-            // Hämta den befintliga entiteten från databasen
+         
             var existingEntity = await _statusRepository.GetAsync(s => s.Id == statusDto.Id);
             if (existingEntity == null)
             {
@@ -96,7 +96,7 @@ public class StatusService(IStatusRepository statusRepository) : IStatusService
 
                 if (updatedStatus != null)
                 {
-                    var saveResult = await _statusRepository.SaveAsync(); // Save changes
+                    var saveResult = await _statusRepository.SaveAsync();
                     if (saveResult > 0)
                     {
                         await _statusRepository.CommitTransactionAsync();

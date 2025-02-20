@@ -107,14 +107,13 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                 return;
             }
 
-            // Visa roller som en numrerad lista
             Console.WriteLine("Select Employee Role:");
             for (int i = 0; i < roles.Count; i++)
             {
                 Console.WriteLine($"{i + 1}. {roles[i].Name}");
             }
 
-            int selectedRoleId = 0; //standard
+            int selectedRoleId = 0;
             while (true)
             {
                 Console.Write("\nEnter the number of the Role: ");
@@ -122,7 +121,7 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
 
                 if (int.TryParse(input, out int roleChoice) && roleChoice > 0 && roleChoice <= roles.Count)
                 {
-                    selectedRoleId = roles[roleChoice - 1].Id; // Hämtar rätt RoleId baserat på valet
+                    selectedRoleId = roles[roleChoice - 1].Id;
                     Console.WriteLine($"Selected Role: {roles[roleChoice - 1].Name}");
                     break;
                 }
@@ -130,11 +129,10 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                 Console.WriteLine("Invalid selection. Please enter a valid number.");
             }
 
-            // Tilldela den valda rollen till newEmployee
             newEmployee.RoleId = selectedRoleId;
 
             var createdEmployee = await _employeeService.CreateEmployeeAsync(newEmployee);
-            if (createdEmployee is Result<EmployeeDto> employeeResult)//MÅSTE KÖR EN IS FÖR ATT KOMMA ÅT DATAN!!!!!!!!
+            if (createdEmployee is Result<EmployeeDto> employeeResult)
             {
                 Console.WriteLine($"Employee created: " +
                     $"{employeeResult.Data.FirstName} " +
@@ -184,10 +182,10 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
 
             Console.WriteLine("----Which Employee Would You Like To Update? Enter the number:");
 
-            // Låt användaren välja en kund
+
             if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= employeesData.Count())
             {
-                var selectedEmployee = employeesData.ElementAt(choice - 1); //hämta vald kund
+                var selectedEmployee = employeesData.ElementAt(choice - 1); 
                 Console.Write($"Enter new first name (leave blank to keep current:({selectedEmployee.FirstName}): ");
                 var newFirstName = Console.ReadLine();
                 Console.Write($"Enter new last name(leave blank to keep current:({selectedEmployee.LastName}): ");
@@ -209,14 +207,13 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                         return;
                     }
 
-                    // Visa roller som en numrerad lista
                     Console.WriteLine("Select Employee Role:");
                     for (int i = 0; i < roles.Count; i++)
                     {
                         Console.WriteLine($"{i + 1}. {roles[i].Name}");
                     }
 
-                    int selectedRoleId = 0; //standard
+                    int selectedRoleId = 0; 
                     while (true)
                     {
                         Console.Write("\nEnter the number of the Role: ");
@@ -224,7 +221,7 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
 
                         if (int.TryParse(input, out int roleChoice) && roleChoice > 0 && roleChoice <= roles.Count)
                         {
-                            selectedRoleId = roles[roleChoice - 1].Id; // Hämtar rätt RoleId baserat på valet
+                            selectedRoleId = roles[roleChoice - 1].Id; 
                             Console.WriteLine($"Selected Role: {roles[roleChoice - 1].Name}");
                             break;
                         }
@@ -232,13 +229,11 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                         Console.WriteLine("Invalid selection. Please enter a valid number.");
                     }
 
-                    // Tilldela den valda rollen till newEmployee
-
                     var newRoleId = selectedRoleId;
                     var updatedEmployee = new EmployeeDto
                     {
-                        Id = selectedEmployee.Id, // Skicka ID:t istället för att söka med namn
-                        FirstName = string.IsNullOrWhiteSpace(newFirstName) ? selectedEmployee.FirstName : newFirstName,//tom eller null behåll gamla : annar newName
+                        Id = selectedEmployee.Id, 
+                        FirstName = string.IsNullOrWhiteSpace(newFirstName) ? selectedEmployee.FirstName : newFirstName,
                         LastName = string.IsNullOrWhiteSpace(newLastName) ? selectedEmployee.LastName : newLastName,
                         Email = string.IsNullOrWhiteSpace(newEmail) ? selectedEmployee.Email : (newEmail),
                         RoleId = newRoleId
@@ -248,7 +243,7 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                     Console.Write("Type 'yes' to save, or anything else to cancel: ");
                     var confirmSave = Console.ReadLine();
 
-                    if (confirmSave?.ToLower() != "yes")// går in i blocket om det kommer in något annat än yes
+                    if (confirmSave?.ToLower() != "yes")
                     {
                         Console.WriteLine("\nEdit cancelled. Returning to menu...");
                         Console.ReadKey();
@@ -272,7 +267,6 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
 
         Console.WriteLine("This Is The Employee List:");
 
-        // Hämta alla projekt
         var employeesResult = await _employeeService.GetEmployeeAsync();
 
         if (employeesResult is Result<IEnumerable<EmployeeDto>> employeeResult && employeeResult.Success)
@@ -287,7 +281,6 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
                 return;
             }
 
-            // Visa alla kunder
             int index = 1;
             foreach (var employee in employees)
             {
@@ -300,7 +293,6 @@ public class EmployeeMenuDialogs : IEmployeeMenuDialogs
             {
                 var selectedEmployee = employees.ElementAt(choice - 1);
 
-                // Be om bekräftelse innan radering
                 Console.WriteLine($"Are you sure you want to delete this employee: {selectedEmployee.FirstName}? (y/n)");
                 var confirmation = Console.ReadLine();
 

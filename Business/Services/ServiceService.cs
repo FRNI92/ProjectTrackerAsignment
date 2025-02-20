@@ -106,7 +106,7 @@ public class ServiceService : IServiceService
                 return Result.NotFound("Could not find the service to update");
             }
 
-            // ✅ Behåll gamla värden om fältet är tomt
+            // keep the old value if empty
             existingEntity.Name = string.IsNullOrWhiteSpace(serviceDto.Name) ? existingEntity.Name : serviceDto.Name;
             existingEntity.Description = string.IsNullOrWhiteSpace(serviceDto.Description) ? existingEntity.Description : serviceDto.Description;
             existingEntity.Duration = serviceDto.Duration > 0 ? serviceDto.Duration : existingEntity.Duration;

@@ -13,15 +13,15 @@ namespace Tests.Mock_Service_Tests;
 
 public class ProjectService_Tests
 {
-    private readonly Mock<IProjectRepository> _projectRepositoryMock;//mocka repos
-    private readonly Mock<IServiceService> _serviceServiceMock; //mocka serviceservice
-    private readonly IProjectService _projectService; // Använd den riktiga servicen
+    private readonly Mock<IProjectRepository> _projectRepositoryMock;
+    private readonly Mock<IServiceService> _serviceServiceMock; 
+    private readonly IProjectService _projectService; 
 
     public ProjectService_Tests()
     {
-        _projectRepositoryMock = new Mock<IProjectRepository>(); // Mocka repository
-        _serviceServiceMock = new Mock<IServiceService>(); // Mocka ServiceService
-        _projectService = new ProjectService(_projectRepositoryMock.Object, _serviceServiceMock.Object); // Skicka in mockade objekt
+        _projectRepositoryMock = new Mock<IProjectRepository>(); 
+        _serviceServiceMock = new Mock<IServiceService>(); 
+        _projectService = new ProjectService(_projectRepositoryMock.Object, _serviceServiceMock.Object); 
     }
 
     [Fact]
@@ -66,10 +66,10 @@ public class ProjectService_Tests
 
         _projectRepositoryMock
             .Setup(repos => repos.GetAllAsync())
-            .ReturnsAsync(testProjects); // Mockar att repo returnerar en lista med projekt
+            .ReturnsAsync(testProjects);
 
         // Act
-        var result = await _projectService.GetAllProjectAsync(); // Vänta på Task<IResult>
+        var result = await _projectService.GetAllProjectAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -81,7 +81,7 @@ public class ProjectService_Tests
         {
             var projectDtos = successResult.Data.ToList();
 
-            Assert.Equal(2, projectDtos.Count); // Kontrollera att vi får 2 projekt
+            Assert.Equal(2, projectDtos.Count);
             Assert.Equal("testnumber1", projectDtos[0].ProjectNumber);
             Assert.Equal("testnumber2", projectDtos[1].ProjectNumber);
         }
@@ -120,7 +120,6 @@ public class ProjectService_Tests
         .Setup(repos => repos.GetAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()))
         .ReturnsAsync(original);
 
-        // Mocka att TransactionUpdateAsync uppdaterar och returnerar det nya projektet
         _projectRepositoryMock
          .Setup(repos => repos.TransactionUpdateAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>(), It.IsAny<ProjectEntity>()))
          .ReturnsAsync(updatedEntity);
@@ -143,7 +142,7 @@ public class ProjectService_Tests
         if (result is Result<ProjectDto> updatedProjectDto)
         {
             Assert.NotNull(updatedProjectDto.Data);
-            Assert.Equal("ChangedName", updatedProjectDto.Data.Name); // Kontrollera att namnet ändrades
+            Assert.Equal("ChangedName", updatedProjectDto.Data.Name); 
         }
         else
         {
@@ -171,17 +170,15 @@ public class ProjectService_Tests
             Name = "TestProject"
         };
 
-        // Mocka att projektet hittas vid GetAsync()
+
         _projectRepositoryMock
             .Setup(repo => repo.GetAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()))
             .ReturnsAsync(existingProject);
 
-        // Mocka att RemoveAsync lyckas, returnerar bool
         _projectRepositoryMock
             .Setup(repo => repo.RemoveAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()))
             .ReturnsAsync(true);
 
-        // Mocka att SaveAsync lyckas, returnerar int
         _projectRepositoryMock
             .Setup(repo => repo.SaveAsync())
             .ReturnsAsync(1);
@@ -193,9 +190,9 @@ public class ProjectService_Tests
         //assert
         Assert.NotNull(result);
         Assert.IsAssignableFrom<IResult>(result);
-        Assert.True(result.Success); // Kontrollera att resultatet är en success
+        Assert.True(result.Success);
 
-        // Verifiera att rätt metoder anropas
+
         _projectRepositoryMock.Verify(repo => repo.GetAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()), Times.Once);
         _projectRepositoryMock.Verify(repo => repo.RemoveAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()), Times.Once);
         _projectRepositoryMock.Verify(repo => repo.SaveAsync(), Times.Once);
@@ -203,14 +200,13 @@ public class ProjectService_Tests
 
     }
 }
-
-
-
-
-
-
-
     //Task<IResult> CreateProjectAsync(ProjectDto projectDto); test done
     //Task<IResult> GetAllProjectAsync(); test done
     //Task<IResult> UpdateProjectAsync(ProjectDto projectDto); test done
     //Task<IResult> DeleteProjectAsync(ProjectDto projectDto); test done
+
+
+
+
+
+

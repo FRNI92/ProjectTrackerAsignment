@@ -35,7 +35,7 @@ public class ProjectRepository_Tests : Test_Base
             ServiceId = 1,
             EmployeeId = 1,
             Duration = 10,
-            //TotalPrice = 5000 räknas ut av servicen endå
+            //TotalPrice = 5000 is calculated by service
         };
 
         //act
@@ -44,9 +44,7 @@ public class ProjectRepository_Tests : Test_Base
         //assert
 
         Assert.True(result);
-        var savedEntity = await _context.Projects.FindAsync(entity.Id);//nbyggd metod i EFC för att hitta en entitet baserat på primärnyckel
-
-        //gör att jag kan checka mer saker. men detta test ska egentligen bara koll true eller false
+        var savedEntity = await _context.Projects.FindAsync(entity.Id);
         Assert.NotNull(savedEntity);
         Assert.Equal(entity.ProjectNumber, savedEntity.ProjectNumber);
         Assert.Equal(entity.Name, savedEntity.Name);
@@ -57,6 +55,7 @@ public class ProjectRepository_Tests : Test_Base
     [Fact]
     public async Task GetAllAsync_ShouldIncludeFromOtherEnitites()
     {
+        //arrange
         var status = new StatusEntity { Id = 1, Name = "Active" };
         var employee = new EmployeesEntity { 
             Id = 1, 
@@ -76,7 +75,7 @@ public class ProjectRepository_Tests : Test_Base
         _context.Customers.Add(customer);
         _context.Services.Add(service);
 
-        // Lägg till projekt
+
         var project = new ProjectEntity
         {
             Id = 1,
@@ -93,10 +92,10 @@ public class ProjectRepository_Tests : Test_Base
 
         var repository = new ProjectRepository(_context);
 
-        // ACT – Hämta alla projekt
+        // act 
         var result = await repository.GetAllAsync();
 
-        // ASSERT – Kontrollera att data inkluderades korrekt
+        // assert
         Assert.NotNull(result);
         Assert.Single(result);
 
@@ -116,18 +115,18 @@ public class ProjectRepository_Tests : Test_Base
     [Fact]
     public async Task GetAsync_ShouldReturnCorrectEntity()
     {
-        // ARRANGE – Lägg till två entiteter
+        //arrange
         var project1 = new ProjectEntity { Id = 1, ProjectNumber = "P-101", Name = "Project One" };
         var project2 = new ProjectEntity { Id = 2, ProjectNumber = "P-102", Name = "Project Two" };
 
         _context.Projects.Add(project1);
         _context.Projects.Add(project2);
-        await _context.SaveChangesAsync(); // Viktigt för att datan ska finnas i testdatabasen
+        await _context.SaveChangesAsync(); 
 
-        // ACT – Hämta en specifik entitet
-        var result = await _projectRepository.GetAsync(p => p.Id == 2); // Hämta `project2`
+        //act
+        var result = await _projectRepository.GetAsync(p => p.Id == 2); 
 
-        // ASSERT – Kontrollera att rätt entitet hämtades
+        //assert
         Assert.NotNull(result);
         Assert.Equal(2, result.Id);
         Assert.Equal("P-102", result.ProjectNumber);
@@ -152,7 +151,7 @@ public class ProjectRepository_Tests : Test_Base
 
         //Assert
         Assert.NotNull(savedProject);
-        Assert.Equal(1, saveResult); // SaveAsync ska returnera 1 vid en lyckad ändring
+        Assert.Equal(1, saveResult);
         Assert.Equal(project1.Id, savedProject.Id);
         Assert.Equal("TestNumber", savedProject.ProjectNumber);
         Assert.Equal("Test1", savedProject.Name);
@@ -174,9 +173,9 @@ public class ProjectRepository_Tests : Test_Base
         //act
         var loadedEntity = await _projectRepository.GetAsync(p => p.Id == testProject.Id);
         var result = await _projectRepository.RemoveAsync(p => p.Id == testProject.Id);
-        await _projectRepository.SaveAsync(); // Spara ändringen i databasen
+        await _projectRepository.SaveAsync();
 
-        // ASSERT – Kontrollera att projektet har raderats
+        // assert
         var deletedEntity = await _projectRepository.GetAsync(p => p.Id == testProject.Id);
         Assert.True(result);
         Assert.Null(deletedEntity);
@@ -245,10 +244,8 @@ public class ProjectRepository_Tests : Test_Base
 
 
     //Task<bool> DoesEntityExistAsync(Expression<Func<TEntity, bool>> expression); test is done
-
     //Task<TEntity> TransactionUpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity);
     //Task<bool> RemoveAsync(Expression<Func<TEntity, bool>> expression); test is done
-
     //Task<int> SaveAsync(); test is done
     //Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression); test is done
     //Task<bool> AddAsync(TEntity entity); test is done

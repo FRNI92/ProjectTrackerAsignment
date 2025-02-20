@@ -150,7 +150,7 @@ public class ProjectService : IProjectService
             fetcheduneditedProject.ServiceId = projectDto.ServiceId != 0 ? projectDto.ServiceId : fetcheduneditedProject.ServiceId;
             fetcheduneditedProject.Duration = projectDto.Duration != 0 ? projectDto.Duration : fetcheduneditedProject.Duration;
             fetcheduneditedProject.EmployeeId = projectDto.EmployeeId != 0 ? projectDto.EmployeeId : fetcheduneditedProject.EmployeeId;
-            // Skicka med både lambda-uttryck och den uppdaterade entiteten
+
  
 
             var updatedProject = await _projectRepository.TransactionUpdateAsync(p => p.Id == projectDto.Id, fetcheduneditedProject);

@@ -77,7 +77,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         catch (Exception ex)
         {
             Debug.Write($"Error In SaveAsync: {ex.Message}");
-            return 0; // Returnera 0 vid fel istället för false, typ som en bool
+            return 0; // work kind of like a bool
         }
     }
 
@@ -118,10 +118,11 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         }
     }
 
-    //transactionManagement
     public virtual async Task<TEntity> TransactionUpdateAsync(Expression<Func<TEntity, bool>> expression, TEntity updatedEntity)
     {
-
+        // I Had to to the refactoring in stages when adding Transaction Management
+        // I already had an UpdateAsync that the whole system was using. 
+        // So I had both during that time. thats why its called TransactionUpdateAsync
         try
         {
             var existingEntity = await _dbSet.FirstOrDefaultAsync(expression);
@@ -138,10 +139,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
             return null!;
         }
     }
-    //transactionManagement
 
-
-    //transactionManagement
     public virtual async Task<bool> RemoveAsync(Expression<Func<TEntity, bool>> expression)
     {
         try
@@ -160,7 +158,6 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
             return false;
         }
     }
-    //transactionManagement
 
     public virtual async Task<bool> DoesEntityExistAsync(Expression<Func<TEntity, bool>> expression)
     {

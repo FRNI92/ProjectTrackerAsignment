@@ -42,9 +42,11 @@ public class ServiceService_Tests
         _serviceRepositoryMock
             .Setup(repo => repo.SaveAsync())
             .ReturnsAsync(1);
+        
         //act
         var result = await _serviceService.CreateServiceAsync(newDto);
-        //assert does add save
+        
+        //assert 
 
         Assert.NotNull(result);
         Assert.True(result.Success);
@@ -70,13 +72,13 @@ public class ServiceService_Tests
         var result = await _serviceService.ReadServiceAsync();
         //assert
         Assert.NotNull(result);
-        Assert.IsAssignableFrom<IResult>(result); // Kontrollera att vi får tillbaka IResult
+        Assert.IsAssignableFrom<IResult>(result); 
 
         if (result is Result<IEnumerable<ServiceDto>> successResult)
         {
             var data = successResult.Data.ToList();
 
-            Assert.Equal(2, data.Count); // Kontrollera att vi fick tillbaka 2 statusar
+            Assert.Equal(2, data.Count); 
             Assert.Equal("IT", data[0].Name);
             Assert.Equal("Consulting", data[1].Name);
         }
@@ -157,9 +159,10 @@ public class ServiceService_Tests
         _serviceRepositoryMock
             .Setup(repo => repo.SaveAsync())
             .ReturnsAsync(1);
+        
         //act
         var result = await _serviceService.UpdateServiceAsync(newDto);
-        //assert get och save
+        //assert
         Assert.NotNull(result);
         Assert.IsAssignableFrom<IResult>(result);
 
@@ -223,11 +226,8 @@ public class ServiceService_Tests
 
 
 //    Task<IResult> DeleteServiceEntity(int id); test is done
-
 //    Task<IResult> UpdateServiceAsync(ServiceDto serviceDto); test is done
 //    Task<IResult> ReadServiceByIdAsync(int serviceId); test is done
-
-
-//Task<IResult> CreateServiceAsync(ServiceDto serviceDto); test klart
+//  Task<IResult> CreateServiceAsync(ServiceDto serviceDto); test klart
 //    Task<IResult> ReadServiceAsync(); test done
 

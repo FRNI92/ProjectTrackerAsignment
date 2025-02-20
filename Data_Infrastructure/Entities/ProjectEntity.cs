@@ -25,22 +25,20 @@ public class ProjectEntity
 
 
     [Required]
-    public int StatusId { get; set; } // Foreign Key till StatusEntity
+    public int StatusId { get; set; } // Foreign Key To StatusEntity
     [ForeignKey("StatusId")]
-    public StatusEntity? Status { get; set; } // Navigation property
+    public StatusEntity? Status { get; set; } 
 
     [Required]
-    public int CustomerId { get; set; } // Foreign Key till CustomerEntity
+    public int CustomerId { get; set; } // Foreign Key To CustomerEntity
     [ForeignKey("CustomerId")]
-    public CustomersEntity? Customer { get; set; } // Navigation property
+    public CustomersEntity? Customer { get; set; } 
 
     [Required]
-    public int ServiceId { get; set; } // Foreign Key till ServiceEntity
+    public int ServiceId { get; set; } // Foreign Key To ServiceEntity
     [ForeignKey("ServiceId")]
-    public ServiceEntity? Service { get; set; } // Navigation property
-
+    public ServiceEntity? Service { get; set; } 
     [Required]
-    public int EmployeeId { get; set; } // Foreign Key till EmployeeEntity
+    public int EmployeeId { get; set; } // Foreign Key To EmployeeEntity
     [ForeignKey("EmployeeId")]
-    public EmployeesEntity? Employee { get; set; } // projectmanager
-}
+    public EmployeesEntity? Employee { get; set; } 

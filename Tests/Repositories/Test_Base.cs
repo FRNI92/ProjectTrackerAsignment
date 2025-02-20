@@ -16,3 +16,6 @@ public abstract class Test_Base
         _context = new DataContext(options);
     }
 }
+//the Test_Base simplifies test setup byt creating an in-memory database.
+//"_context" can be used in derived test classes, so the dont need to do the configure the database
+//Its InMemory, the tests does not affect eachother, no data is save permamently

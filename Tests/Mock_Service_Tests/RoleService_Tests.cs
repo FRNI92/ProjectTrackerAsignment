@@ -24,6 +24,7 @@ public class RoleService_Tests
     [Fact]
     public async Task CreateRolesAsync_ShouldSaveToDatabase_AndReturnIResult()
     {
+        //arrange
         var newDto = new RolesDto
         {
             Id = 1,
@@ -41,11 +42,13 @@ public class RoleService_Tests
         _rolesRepositoryMock
                 .Setup(repo => repo.SaveAsync())
                 .ReturnsAsync(1);
-        //arrange
+    
+       
         //act
         var result = await _roleService.CreateRoleAsync(newDto);
-        //assert  var result = await _serviceService.CreateServiceAsync(newDto);
-        //assert does add save
+        
+        
+        //assert
 
         Assert.NotNull(result);
         Assert.True(result.Success);
@@ -74,13 +77,13 @@ public class RoleService_Tests
 
         //assert
         Assert.NotNull(result);
-        Assert.IsAssignableFrom<IResult>(result); // Kontrollera att vi får tillbaka IResult
+        Assert.IsAssignableFrom<IResult>(result); 
 
         if (result is Result<IEnumerable<RolesDto>> successResult)
         {
             var data = successResult.Data.ToList();
 
-            Assert.Equal(2, data.Count); // Kontrollera att vi fick tillbaka 2 statusar
+            Assert.Equal(2, data.Count); 
             Assert.Equal("Does stuff", data[0].Description);
             Assert.Equal("Does more stuff", data[1].Description);
         }
@@ -125,9 +128,12 @@ public class RoleService_Tests
         _rolesRepositoryMock
             .Setup(repo => repo.SaveAsync())
             .ReturnsAsync(1);
+        
         //act
+
         var result = await _roleService.UpdateRolesAsync(newDto);
-        //assert get och save
+        
+        //assert
         Assert.NotNull(result);
         Assert.IsAssignableFrom<IResult>(result);
 
@@ -138,7 +144,7 @@ public class RoleService_Tests
         if (result is Result<RolesDto> successResult)
         {
             Assert.NotNull(successResult.Data);
-            Assert.Equal("NEW", successResult.Data.Name); // Kontrollera att namnet ändrades
+            Assert.Equal("NEW", successResult.Data.Name); 
             Assert.Equal("DOES STUFF", successResult.Data.Description);
         }
         else
@@ -146,11 +152,38 @@ public class RoleService_Tests
             Assert.Fail("Expected Result<RolesDto>, but got something else.");
         }
     }
+
+    [Fact]
+    public async Task DeleteRolesAsync_ShouldRemoveAndReturnIResult()
+    {
+        //arrange
+        var newDto = new RolesDto
+        {
+            Id = 1,
+            Name = "SUPERDUPER",
+            Description = "Does Everything"
+        };
+        _rolesRepositoryMock
+            .Setup(repos => repos.DoesEntityExistAsync(It.IsAny<Expression<Func<RolesEntity, bool>>>()))
+            .ReturnsAsync(true);
+
+        _rolesRepositoryMock
+            .Setup(repos => repos.RemoveAsync(It.IsAny<Expression<Func<RolesEntity, bool>>>()))
+            .ReturnsAsync(true);
+
+        _rolesRepositoryMock
+            .Setup(repos => repos.SaveAsync())
+            .ReturnsAsync(1);
+        
+        //act
+         var result = await _roleService.DeleteRolesAsync(newDto);
+        
+        //assert
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IResult>(result);
+        _rolesRepositoryMock.Verify(repo => repo.DoesEntityExistAsync(It.IsAny<Expression<Func<RolesEntity, bool>>>()), Times.Once);
+        _rolesRepositoryMock.Verify(repo => repo.RemoveAsync(It.IsAny<Expression<Func<RolesEntity, bool>>>()), Times.Once);
+        _rolesRepositoryMock.Verify(repo => repo.SaveAsync(), Times.Once);
+    }
 }
 
-    //public Task<IResult> GetAllRolesAsync(); get test done
-    //public Task<IResult> CreateRoleAsync(RolesDto roleDto); does add save test done
-
-    //public Task<IResult> UpdateRolesAsync(RolesDto roleDto);
-
-    //public Task<IResult> DeleteRolesAsync(RolesDto rolesDto);
