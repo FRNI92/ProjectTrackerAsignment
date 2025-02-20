@@ -243,7 +243,7 @@ public class ServiceMenuDialogs : IServiceMenuDialogs
 
         try
         {
-            await _serviceService.DeleteServiceEntity(selectedService.Id);
+            await _serviceService.DeleteServiceAsync(selectedService.Id);
             Console.WriteLine("Service deleted successfully.");
         }
         catch (Exception ex)

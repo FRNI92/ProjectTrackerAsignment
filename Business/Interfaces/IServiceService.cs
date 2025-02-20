@@ -5,7 +5,7 @@ namespace Business.Interfaces
     public interface IServiceService
     {
         Task<IResult> CreateServiceAsync(ServiceDto serviceDto);
-        Task<IResult> DeleteServiceEntity(int id);
+        Task<IResult> DeleteServiceAsync(int id);
         Task<IResult> ReadServiceAsync();
 
         Task<IResult> ReadServiceByIdAsync(int serviceId);

@@ -139,7 +139,7 @@ public class ServiceService : IServiceService
     }
         
 
-    public async Task<IResult> DeleteServiceEntity(int id)
+    public async Task<IResult> DeleteServiceAsync(int id)
     {
         await _serviceRepository.BeginTransactionAsync();
         try
