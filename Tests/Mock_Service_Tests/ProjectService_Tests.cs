@@ -52,30 +52,38 @@ public class ProjectService_Tests
 
     }
 
+    [Fact]
     public async Task GetallProjectAsync_ShouldReturnIResult_AndAllProjects()
     {
-        //arrange
-        var test1 = new ProjectDto
-        {
-            Id = 1,
-            ProjectNumber = "testnumber1",
-            Name = "testname1"
-        };
+        var testProjects = new List<ProjectEntity>
+    {
+        new ProjectEntity { Id = 1, ProjectNumber = "testnumber1", Name = "testname1" },
+        new ProjectEntity { Id = 2, ProjectNumber = "testnumber2", Name = "testname2" }
+    };
 
-        var test2 = new ProjectDto
-        {
-            Id = 2,
-            ProjectNumber = "testnumber2",
-            Name = "testname2"
-        };
         _projectRepositoryMock
-            .Setup(repos => repos.GetAsync(return(projectDto)))
+            .Setup(repos => repos.GetAllAsync())
+            .ReturnsAsync(testProjects); // Mockar att repo returnerar en lista med projekt
+        
+        // Act
+        var result = await _projectService.GetAllProjectAsync(); // Vänta på Task<IResult>
 
-        //act
-        var result = _projectService.GetAllProjectAsync();
+        // Assert
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IResult>(result);
 
-        //assert
-        Assert.True(result);
+        if (result is Result<IEnumerable<ProjectDto>> successResult)
+        {
+            var projectDtos = successResult.Data.ToList();
+            
+            Assert.Equal(2, projectDtos.Count); // Kontrollera att vi får 2 projekt
+            Assert.Equal("testnumber1", projectDtos[0].ProjectNumber);
+            Assert.Equal("testnumber2", projectDtos[1].ProjectNumber);
+        }
+        else
+        {
+            Assert.Fail("Expected Result<List<ProjectDto>>, but got something else.");
+        }
     }
 }
 
