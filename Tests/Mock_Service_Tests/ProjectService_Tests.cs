@@ -6,6 +6,8 @@ using Business.Services;
 using Data_Infrastructure.Entities;
 using Data_Infrastructure.Interfaces;
 using Moq;
+using System.Linq.Expressions;
+using Xunit.Sdk;
 
 namespace Tests.Mock_Service_Tests;
 
@@ -85,12 +87,72 @@ public class ProjectService_Tests
             Assert.Fail("Expected Result<List<ProjectDto>>, but got something else.");
         }
     }
+
+    [Fact]
+    public async Task UpdateProjectAsync_ShouldReturnIResult_WithUpdatedDto()
+    {
+        //arrange
+        var original = new ProjectEntity
+        {
+            Id = 1,
+            ProjectNumber = "Testnumber",
+            Name = "OriginalName",
+            ServiceId = 1
+        };
+        var updatedEntity = new ProjectEntity
+        {
+            Id = 1,
+            ProjectNumber = "Testnumber",
+            Name = "ChangedName",
+            ServiceId = 1
+        };
+        var updatedDto = new ProjectDto
+        {
+            Id = 1,
+            ProjectNumber = "Testnumber",
+            Name = "ChangedName",
+            ServiceId = 1
+        };
+        _projectRepositoryMock
+        .Setup(repos => repos.GetAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()))
+        .ReturnsAsync(original);
+
+        // Mocka att TransactionUpdateAsync uppdaterar och returnerar det nya projektet
+        _projectRepositoryMock
+         .Setup(repos => repos.TransactionUpdateAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>(), It.IsAny<ProjectEntity>()))
+         .ReturnsAsync(updatedEntity);
+
+        _projectRepositoryMock
+            .Setup(repos => repos.SaveAsync())
+            .ReturnsAsync(1);
+
+        // Act 
+        var result = await _projectService.UpdateProjectAsync(updatedDto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IResult>(result);
+
+        if (result is Result<ProjectDto> updatedProjectDto)
+        {
+            Assert.NotNull(updatedProjectDto.Data);
+            Assert.Equal("ChangedName", updatedProjectDto.Data.Name); // Kontrollera att namnet ändrades
+        }
+        else
+        {
+            Assert.Fail("Expected Result<ProjectDto>, but got something else.");
+        }
+
+    }
 }
 
 
 
 
-    //Task<IResult> CreateProjectAsync(ProjectDto projectDto);
-    //Task<IResult> GetAllProjectAsync();
+
+
+
+    //Task<IResult> CreateProjectAsync(ProjectDto projectDto); test done
+    //Task<IResult> GetAllProjectAsync(); test done
     //Task<IResult> UpdateProjectAsync(ProjectDto projectDto);
     //Task<IResult> DeleteProjectAsync(ProjectDto projectDto);
