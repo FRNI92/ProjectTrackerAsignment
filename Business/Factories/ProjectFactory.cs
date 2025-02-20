@@ -28,7 +28,7 @@ public static class ProjectFactory
             CustomerId = projectDto.CustomerId,
             ServiceId = projectDto.ServiceId,
 
-            Duration = projectDto.Duration, // 🔹 Spara durationen
+            Duration = projectDto.Duration,
             TotalPrice = projectDto.TotalPrice
 
         };
@@ -54,8 +54,8 @@ public static class ProjectFactory
             Duration = projectEntity.Duration, // Projektets specifika duration
             TotalPrice = projectEntity.TotalPrice,
 
-            StatusId = projectEntity.StatusId,//ser om detta kan hjälpa så att project är kvar när "status" försvinner
-            StatusName = projectEntity.Status?.Name ?? "No status assigned",// hantera null under utveckling
+            StatusId = projectEntity.StatusId,
+            StatusName = projectEntity.Status?.Name ?? "No status assigned",// handle null during development
 
             CustomerId = projectEntity.CustomerId,
             CustomerName = projectEntity.Customer?.Name ?? "No customer",
