@@ -15,7 +15,7 @@ public class ProjectService_Tests
 {
     private readonly Mock<IProjectRepository> _projectRepositoryMock;//mocka repos
     private readonly Mock<IServiceService> _serviceServiceMock; //mocka serviceservice
-    private readonly ProjectService _projectService; // Använd den riktiga servicen
+    private readonly IProjectService _projectService; // Använd den riktiga servicen
 
     public ProjectService_Tests()
     {
