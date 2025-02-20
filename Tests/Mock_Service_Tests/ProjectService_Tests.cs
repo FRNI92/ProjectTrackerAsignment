@@ -39,7 +39,7 @@ public class ProjectService_Tests
             .Setup(service => service.ReadServiceByIdAsync(It.IsAny<int>()))//to enable the return och mockservicedto
             .ReturnsAsync(Result<ServiceDto>.OK(mockServiceDto));
 
-        var projectDto = new ProjectDto { Id = 1, ProjectNumber = "testnumber", Name = "Test Project", ServiceId = 1 };      
+        var projectDto = new ProjectDto { Id = 1, ProjectNumber = "testnumber", Name = "Test Project", ServiceId = 1 };
 
         _projectRepositoryMock.Setup(repo => repo.AddAsync(It.IsAny<ProjectEntity>())).ReturnsAsync(true);
         _projectRepositoryMock.Setup(repo => repo.SaveAsync()).ReturnsAsync(1); // Simulates success save
@@ -51,6 +51,7 @@ public class ProjectService_Tests
         Assert.NotNull(result);
         Assert.IsAssignableFrom<IResult>(result);
         _projectRepositoryMock.Verify(repo => repo.AddAsync(It.IsAny<ProjectEntity>()), Times.Once);
+        _projectRepositoryMock.Verify(repo => repo.SaveAsync(), Times.Once);
 
     }
 
@@ -66,7 +67,7 @@ public class ProjectService_Tests
         _projectRepositoryMock
             .Setup(repos => repos.GetAllAsync())
             .ReturnsAsync(testProjects); // Mockar att repo returnerar en lista med projekt
-        
+
         // Act
         var result = await _projectService.GetAllProjectAsync(); // Vänta på Task<IResult>
 
@@ -74,10 +75,12 @@ public class ProjectService_Tests
         Assert.NotNull(result);
         Assert.IsAssignableFrom<IResult>(result);
 
+        _projectRepositoryMock.Verify(repo => repo.GetAllAsync(), Times.Once);// getting all projects. getAsync takes expression
+
         if (result is Result<IEnumerable<ProjectDto>> successResult)
         {
             var projectDtos = successResult.Data.ToList();
-            
+
             Assert.Equal(2, projectDtos.Count); // Kontrollera att vi får 2 projekt
             Assert.Equal("testnumber1", projectDtos[0].ProjectNumber);
             Assert.Equal("testnumber2", projectDtos[1].ProjectNumber);
@@ -133,6 +136,10 @@ public class ProjectService_Tests
         Assert.NotNull(result);
         Assert.IsAssignableFrom<IResult>(result);
 
+        _projectRepositoryMock.Verify(repo => repo.GetAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()), Times.Once);
+        _projectRepositoryMock.Verify(repo => repo.TransactionUpdateAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>(), It.IsAny<ProjectEntity>()), Times.Once);
+        _projectRepositoryMock.Verify(repo => repo.SaveAsync(), Times.Once);
+
         if (result is Result<ProjectDto> updatedProjectDto)
         {
             Assert.NotNull(updatedProjectDto.Data);
@@ -142,6 +149,57 @@ public class ProjectService_Tests
         {
             Assert.Fail("Expected Result<ProjectDto>, but got something else.");
         }
+
+    }
+
+
+    [Fact]
+    public async Task DeleteProjectAsync_ShouldRemoveEntity_AndReturnIResult()
+    {
+        //arrange
+        var projectDto = new ProjectDto
+        {
+            Id = 1,
+            ProjectNumber = "TestNumber",
+            Name = "TestProject"
+        };
+
+        var existingProject = new ProjectEntity
+        {
+            Id = 1,
+            ProjectNumber = "TestNumber",
+            Name = "TestProject"
+        };
+
+        // Mocka att projektet hittas vid GetAsync()
+        _projectRepositoryMock
+            .Setup(repo => repo.GetAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()))
+            .ReturnsAsync(existingProject);
+
+        // Mocka att RemoveAsync lyckas, returnerar bool
+        _projectRepositoryMock
+            .Setup(repo => repo.RemoveAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()))
+            .ReturnsAsync(true);
+
+        // Mocka att SaveAsync lyckas, returnerar int
+        _projectRepositoryMock
+            .Setup(repo => repo.SaveAsync())
+            .ReturnsAsync(1);
+
+        //act
+        var result = await _projectService.DeleteProjectAsync(projectDto);
+
+
+        //assert
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IResult>(result);
+        Assert.True(result.Success); // Kontrollera att resultatet är en success
+
+        // Verifiera att rätt metoder anropas
+        _projectRepositoryMock.Verify(repo => repo.GetAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()), Times.Once);
+        _projectRepositoryMock.Verify(repo => repo.RemoveAsync(It.IsAny<Expression<Func<ProjectEntity, bool>>>()), Times.Once);
+        _projectRepositoryMock.Verify(repo => repo.SaveAsync(), Times.Once);
+        //might not need to verify since the test needs the data in setup to work. but its called verify so...
 
     }
 }
@@ -154,5 +212,5 @@ public class ProjectService_Tests
 
     //Task<IResult> CreateProjectAsync(ProjectDto projectDto); test done
     //Task<IResult> GetAllProjectAsync(); test done
-    //Task<IResult> UpdateProjectAsync(ProjectDto projectDto);
-    //Task<IResult> DeleteProjectAsync(ProjectDto projectDto);
+    //Task<IResult> UpdateProjectAsync(ProjectDto projectDto); test done
+    //Task<IResult> DeleteProjectAsync(ProjectDto projectDto); test done
