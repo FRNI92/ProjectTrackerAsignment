@@ -51,7 +51,7 @@ public static class ProjectFactory
             StartDate = projectEntity.StartDate,
             EndDate = projectEntity.EndDate,
 
-            Duration = projectEntity.Duration, // Projektets specifika duration
+            Duration = projectEntity.Duration, 
             TotalPrice = projectEntity.TotalPrice,
 
             StatusId = projectEntity.StatusId,

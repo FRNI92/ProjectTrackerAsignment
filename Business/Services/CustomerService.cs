@@ -26,9 +26,9 @@ public class CustomerService : ICustomerService
         await _customerRepository.BeginTransactionAsync();
         try
         {
-            var entity = CustomerFactory.ToEntity(customerDto); // Mappa DTO till Entity
-            var addResult = await _customerRepository.AddAsync(entity); // Skapa entitet
-            if (!addResult) // Om skapandet lyckades
+            var entity = CustomerFactory.ToEntity(customerDto); 
+            var addResult = await _customerRepository.AddAsync(entity); 
+            if (!addResult) 
             {
                 await _customerRepository.RollBackTransactionAsync();
                 return Result.Error("Unable to create customer");              
@@ -86,13 +86,11 @@ public class CustomerService : ICustomerService
                 return Result.NotFound("Customer not found");
             }
 
-            // Uppdatera fälten
             customer.Name = string.IsNullOrWhiteSpace(customerDto.Name) ? customer.Name : customerDto.Name;
             customer.Email = string.IsNullOrWhiteSpace(customerDto.Email) ? customer.Email : customerDto.Email;
             customer.PhoneNumber = string.IsNullOrWhiteSpace(customerDto.PhoneNumber) ? customer.PhoneNumber : customerDto.PhoneNumber;
 
 
-            // uppdatera i databasen
             var updatedCustomer = await _customerRepository.TransactionUpdateAsync(x => x.Id == customer.Id, customer);
             if (updatedCustomer == null)
             {

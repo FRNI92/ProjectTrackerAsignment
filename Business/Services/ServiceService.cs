@@ -51,7 +51,7 @@ public class ServiceService : IServiceService
         }
     }
 
-    public async Task<IResult> ReadServiceAsync()//den här ska bara läsas så TransactionManagement behövs inte
+    public async Task<IResult> ReadServiceAsync()
     {
         try
         {

@@ -37,7 +37,6 @@ public class StatusService(IStatusRepository statusRepository) : IStatusService
                 return Result.OK();
             }
 
-            // if saveasync fails, role back
             await _statusRepository.RollBackTransactionAsync();
             return Result.Error("Could not create status correctly");
         }

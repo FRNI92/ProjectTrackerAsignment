@@ -98,7 +98,6 @@ public class RoleService(IRolesRepository rolesRepository) : IRoleService
                 return Result.Error("Unable to update role");
             }
 
-            // Save changes to database
             var saveResult = await _rolesRepository.SaveAsync();
             if (saveResult > 0)
             {

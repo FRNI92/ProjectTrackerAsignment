@@ -13,12 +13,12 @@ public class ProjectEntity
     [Required]
     public string Name { get; set; } = null!;
 
-    public string? Description { get; set; } 
+    public string? Description { get; set; }
 
     [Required]
-    public DateTime StartDate { get; set; } 
+    public DateTime StartDate { get; set; }
 
-    public DateTime? EndDate { get; set; } 
+    public DateTime? EndDate { get; set; }
 
     public decimal TotalPrice { get; set; }
     public decimal Duration { get; set; }
@@ -27,18 +27,19 @@ public class ProjectEntity
     [Required]
     public int StatusId { get; set; } // Foreign Key To StatusEntity
     [ForeignKey("StatusId")]
-    public StatusEntity? Status { get; set; } 
+    public StatusEntity? Status { get; set; }
 
     [Required]
     public int CustomerId { get; set; } // Foreign Key To CustomerEntity
     [ForeignKey("CustomerId")]
-    public CustomersEntity? Customer { get; set; } 
+    public CustomersEntity? Customer { get; set; }
 
     [Required]
     public int ServiceId { get; set; } // Foreign Key To ServiceEntity
     [ForeignKey("ServiceId")]
-    public ServiceEntity? Service { get; set; } 
+    public ServiceEntity? Service { get; set; }
     [Required]
     public int EmployeeId { get; set; } // Foreign Key To EmployeeEntity
     [ForeignKey("EmployeeId")]
-    public EmployeesEntity? Employee { get; set; } 
+    public EmployeesEntity? Employee { get; set; }
+}

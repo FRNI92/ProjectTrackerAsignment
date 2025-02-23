@@ -38,16 +38,16 @@ public class ProjectService : IProjectService
                 return Result.NotFound("Could not find a service with that service ID");
             }
 
-            var selectedService = successResult.Data; // Extrahera den faktiska ServiceDto
+            var selectedService = successResult.Data; 
 
-            // Beräkna totalpris baserat på tjänstens pris och användarens valda duration
+
             var totalPrice = selectedService.Price * projectDto.Duration;
 
             var entity = ProjectFactory.ToEntity(projectDto);
-            entity.TotalPrice = totalPrice; // Spara totalpriset i entiteten
-            entity.Duration = projectDto.Duration; // Spara duration
+            entity.TotalPrice = totalPrice; 
+            entity.Duration = projectDto.Duration; 
 
-            var result = await _projectRepository.AddAsync(entity); // Spara projektet
+            var result = await _projectRepository.AddAsync(entity); 
             if (!result)
             {
                 await _projectRepository.RollBackTransactionAsync();
@@ -102,7 +102,6 @@ public class ProjectService : IProjectService
         await _projectRepository.BeginTransactionAsync();
         try
         {
-            //Hämta projektet
             var fetcheduneditedProject = await _projectRepository.GetAsync(p => p.Id == projectDto.Id);
             if (fetcheduneditedProject == null)
             {
@@ -110,13 +109,12 @@ public class ProjectService : IProjectService
                 return Result.Error("An error occurred while loading the project.");
             }
 
-            //Hämta den nya tjänsten om ServiceId ändrats
             if (projectDto.ServiceId != fetcheduneditedProject.ServiceId)
             {
                 var serviceResult = await _serviceService.ReadServiceByIdAsync(projectDto.ServiceId);
                 if (serviceResult is Result<ServiceDto> successResult)
                 {
-                    var selectedService = successResult.Data; // Extrahera ServiceDto
+                    var selectedService = successResult.Data;
                     fetcheduneditedProject.ServiceId = projectDto.ServiceId;
                     fetcheduneditedProject.TotalPrice = selectedService.Price * fetcheduneditedProject.Duration;
                 }
@@ -127,7 +125,6 @@ public class ProjectService : IProjectService
                 }
             }
 
-            // Uppdatera durationen och räkna om priset om den ändrats
             if (projectDto.Duration != 0 && projectDto.Duration != fetcheduneditedProject.Duration)
             {
                 fetcheduneditedProject.Duration = projectDto.Duration;
@@ -140,7 +137,6 @@ public class ProjectService : IProjectService
                 }
             }
 
-            //Uppdatera specifika fält för projektet
             fetcheduneditedProject.Name = string.IsNullOrWhiteSpace(projectDto.Name) ? fetcheduneditedProject.Name : projectDto.Name;
             fetcheduneditedProject.Description = string.IsNullOrWhiteSpace(projectDto.Description) ? fetcheduneditedProject.Description : projectDto.Description;
             fetcheduneditedProject.StartDate = projectDto.StartDate != DateTime.MinValue ? projectDto.StartDate : fetcheduneditedProject.StartDate;
